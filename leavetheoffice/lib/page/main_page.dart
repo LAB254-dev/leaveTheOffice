@@ -1,6 +1,5 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:leavetheoffice/components/header_component.dart';
 import 'package:leavetheoffice/components/staff_list_component.dart';
 
@@ -12,6 +11,7 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setEnabledSystemUIOverlays ([]);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,

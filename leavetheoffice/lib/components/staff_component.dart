@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class Staff extends StatefulWidget {
   String name;
@@ -144,7 +143,10 @@ class _StaffState extends State<Staff> {
     } else {
       isWorking = false;
       //show dialog
+      timeMessage = beforeWork;
+      workMin = 0;
       buttonMessage = buttonTexts[0];
+      workEndTime = DateTime.now();
       _timer?.cancel();
     }
 

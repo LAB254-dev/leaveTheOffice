@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:leavetheoffice/components/staff_component.dart';
 import 'package:leavetheoffice/data/staff_info_data.dart';
 
+import '../data/staff_info_data.dart';
+
 class StaffList extends StatefulWidget {
   @override
   State createState() => _StaffListState();
@@ -15,7 +17,8 @@ class _StaffListState extends State<StaffList> {
       Staff_info("김도연", "DEVELOPER"),
       Staff_info("박지윤", "DEVELOPER"),
       Staff_info("박정아", "PM"),
-      Staff_info("상한규", "INTERN")
+      Staff_info("상한규", "INTERN"),
+      Staff_info("당병진", "DEVELOPER")
     ];
 
     GridView memberGrid = GridView.builder(
@@ -33,7 +36,7 @@ class _StaffListState extends State<StaffList> {
       ),
     );
 
-    return Container(
+    return Expanded(
       child: memberGrid,
     );
   }

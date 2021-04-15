@@ -1,12 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class Staff extends StatefulWidget {
-
   String name;
   String roll;
 
-  Staff (String name, String roll){
+  Staff(String name, String roll) {
     this.name = name;
     this.roll = roll;
   }
@@ -15,28 +16,33 @@ class Staff extends StatefulWidget {
   State createState() => _StaffState(name, roll);
 }
 
-class _StaffState extends State<Staff>{
+class _StaffState extends State<Staff> {
+  // Constants
+  static const List<String> buttonTexts = ["출근하기", "퇴근하기"];
+  static const String beforeWork = "출근 전";
 
+  // Staff info
   String name;
-
   String roll;
 
-  String timeLeft = "출근전";
-
+  // Time management
+  Timer _timer;
   bool isWorking = false;
+  int workMin = 0;
 
+  // DB
   DateTime workStartTime;
-
   DateTime workEndTime;
 
-  String buttonMessage = "출근하기";
+  // Component variables
+  String timeMessage = beforeWork;
+  String buttonMessage = buttonTexts[0];
 
-  _StaffState(String name, String roll){
+  _StaffState(String name, String roll) {
     this.name = name;
     this.roll = roll;
     this.isWorking = false;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +68,7 @@ class _StaffState extends State<Staff>{
             flex: 55,
             child: Center(
               child: Text(
-                '환영합니다. ❤ ${roll !=null ? roll : "담당 로딩 실패.."}',
+                '환영합니다. ❤ ${roll != null ? roll : "담당 로딩 실패.."}',
                 style: TextStyle(
                   fontSize: 18,
                 ),
@@ -73,7 +79,7 @@ class _StaffState extends State<Staff>{
             flex: 70,
             child: Center(
               child: Text(
-                name !=null ? name : "이름 로딩 실패..",
+                name != null ? name : "이름 로딩 실패..",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 48,
@@ -86,11 +92,11 @@ class _StaffState extends State<Staff>{
             flex: 50,
             child: Center(
               child: Text(
-                timeLeft,
+                timeMessage,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
-                  color: Colors.red,
+                  color: Color(0xFFE05764),
                 ),
               ),
             ),
@@ -109,7 +115,6 @@ class _StaffState extends State<Staff>{
                     horizontal: 140,
                     vertical: 15,
                   ),
-
                 ),
                 child: Text(buttonMessage),
                 onPressed: _buttonClicked,
@@ -122,20 +127,42 @@ class _StaffState extends State<Staff>{
   }
 
   void _buttonClicked() {
-
     debugPrint("clicked");
     //click when start working
-    if(!isWorking){
-
+    if (!isWorking) {
       isWorking = true;
-      workStartTime = DateTime.now();
 
-      debugPrint(new DateFormat.Hms().format(workStartTime));
+      workStartTime = DateTime.now();
+      _updateWorkHours();
+      buttonMessage = buttonTexts[1];
+
+      _timer = new Timer.periodic(Duration(seconds: 1), (timer) {
+        _updateWorkHours();
+      });
 
       //click during working
-    }else{
+    } else {
       isWorking = false;
+      //show dialog
+      buttonMessage = buttonTexts[0];
+      _timer?.cancel();
     }
 
+    setState(() {
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _updateWorkHours() {
+    debugPrint("$name, $workMin");
+    setState(() {
+      timeMessage = "${(workMin / 60).floor()}시간 ${workMin % 60}분";
+    });
+    workMin++;
   }
 }

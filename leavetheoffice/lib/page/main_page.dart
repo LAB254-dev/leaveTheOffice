@@ -11,18 +11,23 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    // 어플리케이션 전체화면 설정
     SystemChrome.setEnabledSystemUIOverlays ([]);
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         title: Text("앵무시계"),
       ),
+
       body: Center(
         child: Column(children: [
           Header(),
           StaffList(),
         ]),
       ),
+
     );
   }
 }

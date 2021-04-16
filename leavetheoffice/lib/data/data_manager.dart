@@ -24,20 +24,4 @@ class DataManager{
   Staff_info getStaffInfo(int index){
     return _staffs[index];
   }
-
-  void startTimer(int index, Timer timer){
-    _staffs[index].timer = timer;
-  }
-
-  void endTimer(int index){
-    _staffs[index].timer?.cancel();
-  }
-
-  bool isWorking(int index){
-    return _staffs[index].isWorking;
-  }
-
-  void switchIsWorking(int index){
-    _staffs[index].isWorking = !_staffs[index].isWorking;
-  }
 }

@@ -27,4 +27,12 @@ class Staff_info {
   void setEndTime(DateTime time){
     _workEndTime = time;
   }
+
+  void startTimer(Timer timer){
+    this.timer = timer;
+  }
+
+  void endTimer(){
+    this.timer?.cancel();
+  }
 }

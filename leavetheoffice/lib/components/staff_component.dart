@@ -16,7 +16,6 @@ class Staff extends StatefulWidget {
   State createState() => _StaffState(index);
 }
 
-
 class _StaffState extends State<Staff> {
   // Constants
   static const List<String> buttonTexts = ["출근하기", "퇴근하기"];
@@ -119,7 +118,9 @@ class _StaffState extends State<Staff> {
 
   @override
   void initState() {
-    if(info.timer != null && info.isWorking){     // 화면에 그려지지 않아 삭제된 컴포넌트의 타이머를 재생
+    if (info.timer != null && info.isWorking) {
+      // 화면에 그려지지 않아 삭제된 컴포넌트인 경우, 타이머를 다시 시작
+      buttonMessage = buttonTexts[1];
       _updateWorkHours();
       _setTimer();
     }
@@ -127,47 +128,46 @@ class _StaffState extends State<Staff> {
 
   @override
   void dispose() {
-    getDataManager().endTimer(index);
+    info.endTimer();
     super.dispose();
   }
 
   void _buttonClicked() {
-    debugPrint("clicked");
-    //click when start working
     if (!info.isWorking) {
+      //click when start working
+      // update data
       info.switchIsWorking();
-
       info.setStartTime(DateTime.now());
-      _updateWorkHours();
+      //update text component
       buttonMessage = buttonTexts[1];
 
       _setTimer();
-
-      //click during working
+      _updateWorkHours();
     } else {
-      getDataManager().switchIsWorking(index);
-      //show dialog
+      //click during working
+      // TODO: SHOW DIALOG
+      // update data
+      info.switchIsWorking();
+      info.setEndTime(DateTime.now());
+      // updqte text components
       timeMessage = beforeWork;
       buttonMessage = buttonTexts[0];
-      info.setEndTime(DateTime.now());
-      getDataManager().endTimer(index);
-      info.switchIsWorking();
-    }
 
-    setState(() {
-    });
+      info.endTimer();
+    }
   }
 
   void _updateWorkHours() {
     DateTime now = DateTime.now();
     int nowSec = now.hour * 360 + now.minute * 60 + now.second;
-    setState(() {
-      timeMessage = "${((nowSec - info.startTimeSec) / 60).floor()}시간 ${(nowSec - info.startTimeSec) % 60}분";
-    });
+    timeMessage =
+        "${((nowSec - info.startTimeSec) / 60).floor()}시간 ${(nowSec - info.startTimeSec) % 60}분";
+
+    setState(() {});
   }
 
-  void _setTimer(){
-    getDataManager().startTimer(index, new Timer.periodic(Duration(seconds: 1), (t){
+  void _setTimer() {
+    info.startTimer(new Timer.periodic(Duration(seconds: 1), (t) {
       _updateWorkHours();
     }));
   }

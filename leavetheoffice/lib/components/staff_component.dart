@@ -21,7 +21,7 @@ class _StaffState extends State<Staff> {
   static const List<String> buttonTexts = ["출근하기", "퇴근하기"];
   static const String beforeWork = "출근 전";
 
-  // Staff info
+  // Staff info정
   int index;
   Staff_info info;
 
@@ -149,7 +149,7 @@ class _StaffState extends State<Staff> {
       // update data
       info.switchIsWorking();
       info.setEndTime(DateTime.now());
-      // updqte text components
+      // update text components
       timeMessage = beforeWork;
       buttonMessage = buttonTexts[0];
 
@@ -158,6 +158,7 @@ class _StaffState extends State<Staff> {
   }
 
   void _updateWorkHours() {
+    // 시간 갱신 및 화면 새로고침
     DateTime now = DateTime.now();
     int nowSec = now.hour * 360 + now.minute * 60 + now.second;
     timeMessage =
@@ -167,6 +168,7 @@ class _StaffState extends State<Staff> {
   }
 
   void _setTimer() {
+    // 타이머 설
     info.startTimer(new Timer.periodic(Duration(seconds: 1), (t) {
       _updateWorkHours();
     }));

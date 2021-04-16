@@ -123,6 +123,7 @@ class _StaffState extends State<Staff> {
       buttonMessage = buttonTexts[1];
       _updateWorkHours();
       _setTimer();
+      setState(() {});
     }
   }
 
@@ -145,15 +146,36 @@ class _StaffState extends State<Staff> {
       _updateWorkHours();
     } else {
       //click during working
-      // TODO: SHOW DIALOG
-      // update data
-      info.switchIsWorking();
-      info.setEndTime(DateTime.now());
-      // update text components
-      timeMessage = beforeWork;
-      buttonMessage = buttonTexts[0];
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text("퇴근하기"),
+              content: Text("퇴근하시겠습니까?"),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("취소")),
+                ElevatedButton(
+                    onPressed: () {
+                      // update data
+                      info.switchIsWorking();
+                      info.setEndTime(DateTime.now());
+                      // update text components
+                      timeMessage = beforeWork;
+                      buttonMessage = buttonTexts[0];
 
-      info.endTimer();
+                      info.endTimer();
+                      setState(() {});
+
+                      Navigator.pop(context);
+                    },
+                    child: Text("확인")),
+              ],
+            );
+          });
     }
   }
 

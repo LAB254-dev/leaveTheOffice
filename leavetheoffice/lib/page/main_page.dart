@@ -2,13 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:leavetheoffice/components/header_component.dart';
 import 'package:leavetheoffice/components/staff_list_component.dart';
+import 'package:leavetheoffice/data/staff_info_data.dart';
+import 'package:leavetheoffice/provider.dart';
 
 import '../components/header_component.dart';
 import '../components/staff_list_component.dart';
 
-class MainPage extends StatelessWidget {
+class MainPage extends StatefulWidget {
   static const routeName = '/';
 
+  @override
+  State createState() {
+    return _MainPageState();
+  }
+}
+
+class _MainPageState extends State<MainPage>{
   @override
   Widget build(BuildContext context) {
 

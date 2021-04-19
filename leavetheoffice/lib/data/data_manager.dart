@@ -1,24 +1,44 @@
+import 'package:flutter/material.dart';
+import 'package:leavetheoffice/provider.dart';
+import 'package:sqflite/sqflite.dart';
+
 import 'staff_info_data.dart';
 
 class DataManager{
-  List<Staff_info> _staffs= [
-    Staff_info("이아영", "DESIGNER"),
-    Staff_info("김도연", "DEVELOPER"),
-    Staff_info("박지윤", "DEVELOPER"),
-    Staff_info("박정아", "PM"),
-    Staff_info("상한규", "INTERN"),
-    Staff_info("당병진", "DEVELOPER"),
-    Staff_info("Test", "test"),
-    Staff_info("Test", "teeest"),
-    Staff_info("Test2", "teeeeest"),
-    Staff_info("name", "roll")
-  ];
-
-  List<Staff_info> getStaffs(){
-    return _staffs;
+  Future<Staff_info> getStaffInfo(int id) async {
+    Database db = await getDatabaseHelper().getDatabase();
+    List<Map<String, dynamic>> row = await db.query(Staff_info.memTableName, where: "${Staff_info.columnId} = ?", whereArgs: [id]);
+    return getDatabaseHelper().rowToMem(row.single);
   }
 
-  Staff_info getStaffInfo(int index){
-    return _staffs[index];
+  Future<List<Staff_info>> staffList() async {
+    Database db = await getDatabaseHelper().getDatabase();
+    List<Map<String, dynamic>> rows = await db.query(Staff_info.memTableName);
+    debugPrint(rows.isNotEmpty?"rows is not empty":"rows is empty");
+    return rows.map((row) => getDatabaseHelper().rowToMem(row)).toList();
+  }
+
+  Future<void> addStaff(Staff_info newStaff) async {
+    Database db = await getDatabaseHelper().getDatabase();
+    db.insert(Staff_info.memTableName, getDatabaseHelper().memToRow(newStaff));
+  }
+
+  Future<void> updateStaff(int id, Staff_info info) async {
+    Database db = await getDatabaseHelper().getDatabase();
+    db.update(Staff_info.memTableName, getDatabaseHelper().memToRow(info), where: "${Staff_info.columnId} = ?", whereArgs: [id]);
+  }
+
+  Future<void> deleteStaff(int id) async {
+    Database db = await getDatabaseHelper().getDatabase();
+    db.delete(Staff_info.memTableName, where: "${Staff_info.columnId} = ?", whereArgs: [id]);
+  }
+  
+  void init(){
+    addStaff(new Staff_info("이아영", "DESIGNER"));
+    addStaff(new Staff_info("김도연", "DEVELOPER"));
+    addStaff(new Staff_info("박지윤", "DEVELOPER"));
+    addStaff(new Staff_info("박정아", "PM"));
+    addStaff(new Staff_info("상한규", "INTERN"));
+    addStaff(new Staff_info("당병진", "DEVELOPER"));
   }
 }

@@ -6,14 +6,12 @@ import 'package:leavetheoffice/provider.dart';
 import '../data/staff_info_data.dart';
 
 class Staff extends StatefulWidget {
-  int index;
+  Staff_info info;
 
-  Staff(int index, String name, String roll) {
-    this.index = index;
-  }
+  Staff(this.info);
 
   @override
-  State createState() => _StaffState(index);
+  State createState() => _StaffState(info);
 }
 
 class _StaffState extends State<Staff> {
@@ -22,17 +20,13 @@ class _StaffState extends State<Staff> {
   static const String beforeWork = "출근 전";
 
   // Staff info정
-  int index;
   Staff_info info;
 
   // Component variables
   String timeMessage = beforeWork;
   String buttonMessage = buttonTexts[0];
 
-  _StaffState(int index) {
-    this.index = index;
-    info = getDataManager().getStaffInfo(index);
-  }
+  _StaffState(this.info);
 
   @override
   Widget build(BuildContext context) {

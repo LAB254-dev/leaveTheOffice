@@ -1,3 +1,6 @@
+import 'package:leavetheoffice/data/att_data_format.dart';
+import 'package:leavetheoffice/provider.dart';
+
 class Attendance{
   //DB
   static const String attTableName = "attendance";
@@ -8,7 +11,8 @@ class Attendance{
 
   //variable
   int id;
-  DateTime date, start, end;
+  Date date;
+  Time start, end;
 
-  Attendance(this.id);
+  Attendance(this.id, this.date, this.start, {this.end});
 }

@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:leavetheoffice/data/att_data_format.dart';
 import 'package:leavetheoffice/data/attendance.dart';
+import 'package:leavetheoffice/provider.dart';
 
 class Staff_info {
   // 기본 정보
@@ -24,6 +26,7 @@ class Staff_info {
   Staff_info(String name, String role, {int id}) {
     this.name = name;
     this.roll = role;
+    this.id = id;
     this.isWorking = false;   // 출근시간이 NOT NULL이고 퇴근시간이 NULL
                               // (_workStartTime != null && _workEndTime == null)일 때 TRUE
   }
@@ -33,13 +36,17 @@ class Staff_info {
   }
 
   // DB
-  void setStartTime(DateTime time){
-    _workStartTime = time;
-    startTimeSec = time.hour * 360 + time.minute * 60 + time.second;
+  void setStartTime(DateTime now){
+    _att = new Attendance(id, Date(now.year, now.month, now.day), Time(now.hour, now.minute, now.second));
+    isWorking = true;
+    startTimeSec = now.hour * 360 + now.minute * 60 + now.second;
+    getDataManager().addAttData(_att);
   }
 
-  void setEndTime(DateTime time){
-    _workEndTime = time;
+  void setEndTime(DateTime now){
+    _att.end = Time(now.hour, now.minute, now.second);
+    isWorking = false;
+    getDataManager().updateAttData(_att, id, _att.date);
   }
 
   // Timer

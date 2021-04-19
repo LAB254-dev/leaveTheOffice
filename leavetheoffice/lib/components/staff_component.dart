@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:leavetheoffice/data/att_data_format.dart';
+import 'package:leavetheoffice/data/attendance.dart';
 import 'package:leavetheoffice/provider.dart';
 
 import '../data/staff_info_data.dart';
@@ -19,7 +21,7 @@ class _StaffState extends State<Staff> {
   static const List<String> buttonTexts = ["출근하기", "퇴근하기"];
   static const String beforeWork = "출근 전";
 
-  // Staff info정
+  // Staff info
   Staff_info info;
 
   // Component variables
@@ -112,6 +114,7 @@ class _StaffState extends State<Staff> {
 
   @override
   void initState() {
+    DateTime now = DateTime.now();
     if (info.timer != null && info.isWorking) {
       // 화면에 그려지지 않아 삭제된 컴포넌트인 경우, 타이머를 다시 시작
       buttonMessage = buttonTexts[1];
@@ -128,11 +131,13 @@ class _StaffState extends State<Staff> {
   }
 
   void _buttonClicked() {
+    debugPrint(info.id.toString());
     if (!info.isWorking) {
       //click when start working
       // update data
       info.switchIsWorking();
       info.setStartTime(DateTime.now());
+      debugPrint(DateTime.now().toString());
       //update text component
       buttonMessage = buttonTexts[1];
 

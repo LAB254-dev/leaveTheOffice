@@ -14,6 +14,10 @@ class DataManager{
   Future<List<Staff_info>> staffList() async {
     Database db = await getDatabaseHelper().getDatabase();
     List<Map<String, dynamic>> rows = await db.query(Staff_info.memTableName);
+    if(rows.isEmpty){
+      initData();
+      List<Map<String, dynamic>> rows = await db.query(Staff_info.memTableName);
+    }
     debugPrint(rows.isNotEmpty?"rows is not empty":"rows is empty");
     return rows.map((row) => getDatabaseHelper().rowToMem(row)).toList();
   }
@@ -33,7 +37,7 @@ class DataManager{
     db.delete(Staff_info.memTableName, where: "${Staff_info.columnId} = ?", whereArgs: [id]);
   }
   
-  void init(){
+  void initData(){
     addStaff(new Staff_info("이아영", "DESIGNER"));
     addStaff(new Staff_info("김도연", "DEVELOPER"));
     addStaff(new Staff_info("박지윤", "DEVELOPER"));

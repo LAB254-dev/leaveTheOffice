@@ -8,7 +8,6 @@ DatabaseHelper _databaseHelper;
 DataManager getDataManager(){
   if(_dataManager == null){
     _dataManager = new DataManager();
-    _dataManager.init();
   }
 
   return _dataManager;

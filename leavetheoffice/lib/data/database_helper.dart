@@ -34,7 +34,6 @@ class DatabaseHelper {
             FOREIGN KEY (${Attendance.columnId}) REFERENCES ${Staff_info.memTableName}(${Staff_info.columnId}),
             PRIMARY KEY(${Attendance.columnId}, ${Attendance.columnDate})
           );
-          INSERT INTO ${Staff_info.memTableName} (${Staff_info.columnName}, ${Staff_info.columnRole}) VALUES ('insert', 'test');
           ''';
       return db.execute(sql);
     });

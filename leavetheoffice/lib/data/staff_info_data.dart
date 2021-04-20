@@ -38,7 +38,7 @@ class Staff_info {
   void setStartTime(DateTime now, {bool isSaved = false}){
     _attendance = new Attendance(id, Date(now.year, now.month, now.day), Time(now.hour, now.minute, now.second));
     isWorking = true;
-    startTimeSec = now.hour * 360 + now.minute * 60 + now.second;
+    startTimeSec = now.hour * 3600 + now.minute * 60 + now.second;
     if(!isSaved)
       getDataManager().addAttData(_attendance);
   }

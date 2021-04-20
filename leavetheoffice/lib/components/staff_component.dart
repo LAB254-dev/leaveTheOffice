@@ -1,9 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:leavetheoffice/data/att_data_format.dart';
 import 'package:leavetheoffice/data/attendance.dart';
-import 'package:leavetheoffice/provider.dart';
 
 import '../data/staff_info_data.dart';
 
@@ -125,8 +123,9 @@ class _StaffState extends State<Staff> {
       setState(() {});
     }
 
+    // 애플리케이션이 중간에 중단되었다가 재시동된 경우 판단
     for(int i =0; i < todayAtt.length; i++){
-      if(todayAtt[i].id == info.id){
+      if(todayAtt[i].id == info.id && todayAtt[i].end == null){
         info.isWorking = true;
         info.setStartTime(DateTime(todayAtt[i].date.year, todayAtt[i].date.month, todayAtt[i].date.day,
             todayAtt[i].start.hour, todayAtt[i].start.min, todayAtt[i].start.sec), isSaved: true);
@@ -197,7 +196,7 @@ class _StaffState extends State<Staff> {
     DateTime now = DateTime.now();
     int nowSec = now.hour * 360 + now.minute * 60 + now.second;
     timeMessage =
-        "${((nowSec - info.startTimeSec) / 360).floor()}시간 ${((nowSec - info.startTimeSec) / 60).floor()}분";
+        "${((nowSec - info.startTimeSec) / 3600).floor()}시간 ${((nowSec - info.startTimeSec) / 60).floor()}분";
 
     setState(() {});
   }

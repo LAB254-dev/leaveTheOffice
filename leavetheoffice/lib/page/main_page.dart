@@ -6,7 +6,7 @@ import 'package:leavetheoffice/components/staff_list_component.dart';
 import '../components/header_component.dart';
 import '../components/staff_list_component.dart';
 
-class MainPage extends StatefulWidget {
+class MainPage extends StatefulWidget {   // Future builder component를 사용하려면 StatefulWidget이어야 함
   static const routeName = '/';
 
   @override

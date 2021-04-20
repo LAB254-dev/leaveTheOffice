@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:leavetheoffice/data/attendance.dart';
 import 'package:leavetheoffice/data/staff_info_data.dart';
 import 'package:path/path.dart';
@@ -20,9 +19,11 @@ class DatabaseHelper {
   }
 
   Future<Database> _init() async {
+    // 데이터베이스 초기 설정
     String dbPath = join(await getDatabasesPath(), _dbName);
     return openDatabase(dbPath, version: _version,
         onCreate: (db, version) async {
+      // 스탭 정보를 저장하는 테이블 생성 쿼리
       String createMemTable = '''
           CREATE TABLE ${Staff_info.memTableName}(
             ${Staff_info.columnId} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,6 +31,7 @@ class DatabaseHelper {
             ${Staff_info.columnRole} TEXT NOT NULL
           );
           ''';
+      //근태 기록을 저장하는 테이블 생성 쿼리
       String createAttTable = '''
           CREATE TABLE ${Attendance.attTableName}(
             ${Attendance.columnId} INTEGER,
@@ -48,6 +50,7 @@ class DatabaseHelper {
   }
 
   Map<String, dynamic> memToRow(Staff_info info) {
+    // Staff_info 클래스를 row 형식으로 바꿈
     return {
       Staff_info.columnName: info.name,
       Staff_info.columnRole: info.roll,
@@ -55,11 +58,13 @@ class DatabaseHelper {
   }
 
   Staff_info rowToMem(Map<String, dynamic> row) {
+    // row 형식 데이터를 Staff_info 형식으로 바꿈
     return Staff_info(row[Staff_info.columnName], row[Staff_info.columnRole],
         id: row[Staff_info.columnId]);
   }
 
   Map<String, dynamic> attToRow(Attendance att) {
+    // Attendance 형식 데이터를 row 형식 데이터로 바꿈
     return {
       Attendance.columnId: att.id,
       Attendance.columnDate: att.date.toString(),
@@ -69,6 +74,7 @@ class DatabaseHelper {
   }
 
   Attendance rowToAtt(Map<String, dynamic> row) {
+    // row 형식 데이터를 Attendance 형식 데이터로 바꿈
     List<String> date = row[Attendance.columnDate].split("-");
     List<int> dateInt = date.map((e)=>int.parse(e)).toList();
     List<String> start = row[Attendance.columnStart].toString().split(":");

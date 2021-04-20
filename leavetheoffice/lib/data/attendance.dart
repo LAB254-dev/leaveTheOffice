@@ -1,8 +1,9 @@
 import 'package:leavetheoffice/data/att_data_format.dart';
-import 'package:leavetheoffice/provider.dart';
 
 class Attendance{
-  //DB
+  // 근태 관리에 필요한 변수들을 이 클래스로 관리
+
+  //DB table / column 이름 정의
   static const String attTableName = "attendance";
   static const String columnId = "id";
   static const String columnDate = "date";
@@ -12,7 +13,7 @@ class Attendance{
   //variable
   int id;
   Date date;
-  Time start, end;
+  Time start, end;    // 근무 시작시간, 끝 시간
 
   Attendance(this.id, this.date, this.start, {this.end});
 }

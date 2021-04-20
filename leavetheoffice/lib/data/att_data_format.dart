@@ -7,7 +7,7 @@ class Date{
 
   String toString(){
     super.toString();
-    return year.toString() + "/" + month.toString() + "/" + day.toString();
+    return year.toString() + "-" + month.toString() + "-" + day.toString();
   }
 }
 

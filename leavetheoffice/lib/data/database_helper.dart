@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:leavetheoffice/data/attendance.dart';
 import 'package:leavetheoffice/data/staff_info_data.dart';
 import 'package:path/path.dart';
@@ -68,14 +69,14 @@ class DatabaseHelper {
   }
 
   Attendance rowToAtt(Map<String, dynamic> row) {
-    List<String> date = row[Attendance.columnDate].toString().split("/");
-    List<int> dateInt = date.map((e) => int.parse(e));
+    List<String> date = row[Attendance.columnDate].split("-");
+    List<int> dateInt = date.map((e)=>int.parse(e)).toList();
     List<String> start = row[Attendance.columnStart].toString().split(":");
-    List<int> startInt = start.map((e) => int.parse(e));
+    List<int> startInt = start.map((e) => int.parse(e)).toList();
     List<int> endInt;
-    if (row[Attendance.columnEnd] != null) {
+    if (row[Attendance.columnEnd] != "null") {
       List<String> end = row[Attendance.columnEnd].toString().split(":");
-      endInt = end.map((e) => int.parse(e));
+      endInt = end.map((e) => int.parse(e)).toList();
     } else {
       endInt = null;
     }

@@ -53,6 +53,15 @@ class DataManager{
     List<Map<String,dynamic>> row = await db.query(Attendance.attTableName, where: "${Attendance.columnId} = ? and ${Attendance.columnDate} = ?", whereArgs: [id, date.toString()]);
     return getDatabaseHelper().rowToAtt(row.single);
   }
+
+  Future<List<Attendance>> getTodayAtts(Date date) async {
+    Database db = await getDatabaseHelper().getDatabase();
+    List<Map<String, dynamic>> rows = await db.query(Attendance.attTableName, where: "${Attendance.columnDate} = ?", whereArgs: [date.toString()]);
+    //debugPrint(rows[0][Attendance.columnId].toString());
+    return rows.map((row) => getDatabaseHelper().rowToAtt(row)).toList();
+
+    //return [Attendance(2, Date(2021, 04, 20), Time(9, 0, 1))];
+  }
   
   Future<void> initData() async{
     await addStaff(new Staff_info("이아영", "DESIGNER"));

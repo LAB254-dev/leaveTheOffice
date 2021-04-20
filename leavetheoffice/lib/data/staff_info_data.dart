@@ -36,11 +36,12 @@ class Staff_info {
   }
 
   // DB
-  void setStartTime(DateTime now){
+  void setStartTime(DateTime now, {bool isSaved = false}){
     _att = new Attendance(id, Date(now.year, now.month, now.day), Time(now.hour, now.minute, now.second));
     isWorking = true;
     startTimeSec = now.hour * 360 + now.minute * 60 + now.second;
-    getDataManager().addAttData(_att);
+    if(!isSaved)
+      getDataManager().addAttData(_att);
   }
 
   void setEndTime(DateTime now){

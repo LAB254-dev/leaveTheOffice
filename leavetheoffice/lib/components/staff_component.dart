@@ -9,11 +9,12 @@ import '../data/staff_info_data.dart';
 
 class Staff extends StatefulWidget {
   Staff_info info;
+  List<Attendance> todayAtt;
 
-  Staff(this.info);
+  Staff(this.info, this.todayAtt);
 
   @override
-  State createState() => _StaffState(info);
+  State createState() => _StaffState(info, todayAtt);
 }
 
 class _StaffState extends State<Staff> {
@@ -23,12 +24,13 @@ class _StaffState extends State<Staff> {
 
   // Staff info
   Staff_info info;
+  List<Attendance> todayAtt;
 
   // Component variables
   String timeMessage = beforeWork;
   String buttonMessage = buttonTexts[0];
 
-  _StaffState(this.info);
+  _StaffState(this.info, this.todayAtt);
 
   @override
   Widget build(BuildContext context) {
@@ -122,6 +124,18 @@ class _StaffState extends State<Staff> {
       _setTimer();
       setState(() {});
     }
+
+    for(int i =0; i < todayAtt.length; i++){
+      if(todayAtt[i].id == info.id){
+        info.isWorking = true;
+        info.setStartTime(DateTime(todayAtt[i].date.year, todayAtt[i].date.month, todayAtt[i].date.day,
+            todayAtt[i].start.hour, todayAtt[i].start.min, todayAtt[i].start.sec), isSaved: true);
+        buttonMessage = buttonTexts[1];
+        _updateWorkHours();
+        _setTimer();
+        setState(() {});
+      }
+    }
   }
 
   @override
@@ -183,7 +197,7 @@ class _StaffState extends State<Staff> {
     DateTime now = DateTime.now();
     int nowSec = now.hour * 360 + now.minute * 60 + now.second;
     timeMessage =
-        "${((nowSec - info.startTimeSec) / 60).floor()}시간 ${(nowSec - info.startTimeSec) % 60}분";
+        "${((nowSec - info.startTimeSec) / 360).floor()}시간 ${((nowSec - info.startTimeSec) / 60).floor()}분";
 
     setState(() {});
   }

@@ -2,17 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:leavetheoffice/data/attendance.dart';
+import 'package:leavetheoffice/page/alert_page.dart';
 
 import '../data/staff_info_data.dart';
 
 class Staff extends StatefulWidget {
   Staff_info info;
-  List<Attendance> todayAtt;
+  List<Attendance> todayAttendance;
 
-  Staff(this.info, this.todayAtt);
+  Staff(this.info, this.todayAttendance);
 
   @override
-  State createState() => _StaffState(info, todayAtt);
+  State createState() => _StaffState(info, todayAttendance);
 }
 
 class _StaffState extends State<Staff> {
@@ -106,6 +107,18 @@ class _StaffState extends State<Staff> {
                 onPressed: _buttonClicked,
               ),
             ),
+          ),
+          TextButton(
+            child: Text("알람 페이지 호출 테스트 버튼"),
+            onPressed: () {
+              Navigator.pushNamed((context), AlertPage.routeName,
+                      arguments: info)
+                  .then((v) {
+                timeMessage = beforeWork;
+                buttonMessage = buttonTexts[0];
+                setState(() {});
+              });
+            },
           )
         ],
       ),
@@ -114,6 +127,7 @@ class _StaffState extends State<Staff> {
 
   @override
   void initState() {
+    super.initState();
     DateTime now = DateTime.now();
     if (info.timer != null && info.isWorking) {
       // 화면에 그려지지 않아 삭제된 컴포넌트인 경우, 타이머를 다시 시작
@@ -124,11 +138,18 @@ class _StaffState extends State<Staff> {
     }
 
     // 애플리케이션이 중간에 중단되었다가 재시동된 경우 판단
-    for(int i =0; i < todayAtt.length; i++){
-      if(todayAtt[i].id == info.id && todayAtt[i].end == null){
+    for (int i = 0; i < todayAtt.length; i++) {
+      if (todayAtt[i].id == info.id && todayAtt[i].end == null) {
         info.isWorking = true;
-        info.setStartTime(DateTime(todayAtt[i].date.year, todayAtt[i].date.month, todayAtt[i].date.day,
-            todayAtt[i].start.hour, todayAtt[i].start.min, todayAtt[i].start.sec), isSaved: true);
+        info.setStartTime(
+            DateTime(
+                todayAtt[i].date.year,
+                todayAtt[i].date.month,
+                todayAtt[i].date.day,
+                todayAtt[i].start.hour,
+                todayAtt[i].start.min,
+                todayAtt[i].start.sec),
+            isSaved: true);
         buttonMessage = buttonTexts[1];
         _updateWorkHours();
         _setTimer();
@@ -144,7 +165,6 @@ class _StaffState extends State<Staff> {
   }
 
   void _buttonClicked() {
-    debugPrint(info.id.toString());
     if (!info.isWorking) {
       //click when start working
       // update data

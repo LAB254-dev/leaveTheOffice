@@ -15,10 +15,9 @@ class Staff_info {
   static const String columnId = "id";           //primary key
   static const String columnName = "name";
   static const String columnRole = "role";
-  DateTime _workStartTime, _workEndTime;
 
   // 시간 계산
-  Attendance _att;
+  Attendance _attendance;
   int startTimeSec;
   Timer timer;
   bool isWorking;
@@ -37,17 +36,17 @@ class Staff_info {
 
   // DB
   void setStartTime(DateTime now, {bool isSaved = false}){
-    _att = new Attendance(id, Date(now.year, now.month, now.day), Time(now.hour, now.minute, now.second));
+    _attendance = new Attendance(id, Date(now.year, now.month, now.day), Time(now.hour, now.minute, now.second));
     isWorking = true;
     startTimeSec = now.hour * 360 + now.minute * 60 + now.second;
     if(!isSaved)
-      getDataManager().addAttData(_att);
+      getDataManager().addAttData(_attendance);
   }
 
   void setEndTime(DateTime now){
-    _att.end = Time(now.hour, now.minute, now.second);
+    _attendance.end = Time(now.hour, now.minute, now.second);
     isWorking = false;
-    getDataManager().updateAttData(_att, id, _att.date);
+    getDataManager().updateAttData(_attendance, id, _attendance.date);
   }
 
   // Timer

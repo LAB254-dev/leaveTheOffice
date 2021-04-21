@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:leavetheoffice/data/att_data_format.dart';
 import 'package:leavetheoffice/data/attendance.dart';
 import 'package:leavetheoffice/provider.dart';
@@ -20,32 +21,28 @@ class Staff_info {
   Attendance _attendance;
   int startTimeSec;
   Timer timer;
-  bool isWorking;
+  int workState; // 0: before, 1: ing, 2: after
 
   Staff_info(String name, String role, {int id}) {
     this.name = name;
     this.roll = role;
     this.id = id;
-    this.isWorking = false;   // 출근시간이 NOT NULL이고 퇴근시간이 NULL
-                              // (_workStartTime != null && _workEndTime == null)일 때 TRUE
-  }
-
-  void switchIsWorking(){
-    this.isWorking = !this.isWorking;
   }
 
   // DB
-  void setStartTime(DateTime now, {bool isSaved = false}){
-    _attendance = new Attendance(id, Date(now.year, now.month, now.day), Time(now.hour, now.minute, now.second));
-    isWorking = true;
-    startTimeSec = now.hour * 3600 + now.minute * 60 + now.second;
-    if(!isSaved)
+  void setStartTime(Time time, bool isSaved, {Date date}){
+    // 근무 시작 시간 저장
+    startTimeSec = time.hour * 3600 + time.min * 60 + time.sec;
+    _attendance = new Attendance(id, date, time);
+    workState = 1;
+    if(!isSaved)  // 데이터베이스에 저장
       getDataManager().addAttData(_attendance);
   }
 
   void setEndTime(DateTime now){
+    // 근무 종료 시간 저장
     _attendance.end = Time(now.hour, now.minute, now.second);
-    isWorking = false;
+    // 데이터베이스에 저장
     getDataManager().updateAttData(_attendance, id, _attendance.date);
   }
 
@@ -56,5 +53,19 @@ class Staff_info {
 
   void endTimer(){
     this.timer?.cancel();
+  }
+
+  void setAttendance(Attendance attendance){
+    workState = 0;
+    if(attendance != null) {
+      _attendance = attendance;
+      setStartTime(attendance.start, true);
+      if (attendance.end == null) {
+        workState = 1;
+      }
+      else {
+        workState = 2;
+      }
+    }
   }
 }

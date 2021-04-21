@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
+  // 여러 페이지에서 사용하는 컴포넌트 모듈화
   String title;
   VoidCallback callback;
   Color color = Colors.lightBlue.shade600;

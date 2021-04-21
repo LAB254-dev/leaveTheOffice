@@ -7,7 +7,8 @@ import 'package:leavetheoffice/page/alert_page.dart';
 import '../components/header_component.dart';
 import '../components/staff_list_component.dart';
 
-class MainPage extends StatefulWidget {   // Future builder component를 사용하려면 StatefulWidget이어야 함
+class MainPage extends StatefulWidget {
+  // Future builder component를 사용하려면 StatefulWidget이어야 함
   static const routeName = '/';
 
   @override
@@ -16,19 +17,24 @@ class MainPage extends StatefulWidget {   // Future builder component를 사용�
   }
 }
 
-class _MainPageState extends State<MainPage>{
+class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
-
     // 어플리케이션 전체화면 설정
-    SystemChrome.setEnabledSystemUIOverlays ([]);
+    SystemChrome.setEnabledSystemUIOverlays([]);
 
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         title: Text("앵무시계"),
+        actions: [
+          IconButton(
+              icon: Icon(Icons.refresh),
+              onPressed: () {
+                setState(() {});
+              })
+        ],
       ),
-
       body: Center(
         child: Column(children: [
           Header(),

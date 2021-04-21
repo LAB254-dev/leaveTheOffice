@@ -21,7 +21,6 @@ class PageManager {
       Navigator.pop(_contextQueue[0]);
       _infoQueue.removeAt(0);
       _contextQueue.removeAt(0);
-
       if (_infoQueue.isNotEmpty) {
         _pushPage(_contextQueue[0], _infoQueue[0]);
       }

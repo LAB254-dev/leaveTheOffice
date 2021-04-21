@@ -29,7 +29,11 @@ class _AlertPageState extends State<AlertPage> {
     args = ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
-      appBar: AppBar(centerTitle: true, title: Text("앵무시계"), automaticallyImplyLeading: false,),
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text("앵무시계"),
+        automaticallyImplyLeading: false,
+      ),
       body: Container(
         child: Align(
             alignment: Alignment.topCenter,
@@ -63,19 +67,23 @@ class _AlertPageState extends State<AlertPage> {
                 ),
                 SizedBox(height: 20),
                 CustomButton("퇴근하기", _acceptClicked),
-                CustomButton("취소", _cancelClicked, color: Color(0xFFE0E0E0), textColor: Color(0xFF616161),),
+                CustomButton(
+                  "취소",
+                  _cancelClicked,
+                  color: Color(0xFFE0E0E0),
+                  textColor: Color(0xFF616161),
+                ),
               ],
             )),
       ),
     );
   }
 
-
   @override
   void initState() {
     super.initState();
     audioPlay();
-    _timer = new Timer(Duration(seconds: 10), (){
+    _timer = new Timer(Duration(seconds: 10), () {
       _cancelClicked();
     });
   }
@@ -86,9 +94,7 @@ class _AlertPageState extends State<AlertPage> {
   }
 
   void _acceptClicked() {
-    args.switchIsWorking();
-    args.setEndTime(DateTime.now());
-    args.endTimer();
+    args.workState = 2;
     stopAudioPlay();
     getPageManager().broadcastPop(args.id);
   }
@@ -98,13 +104,13 @@ class _AlertPageState extends State<AlertPage> {
     getPageManager().broadcastPop(args.id);
   }
 
-  void audioPlay() async{
+  void audioPlay() async {
     debugPrint("music playing");
     const audioPath = "IU-LILAC.mp3";
     player = await cache.play(audioPath);
   }
 
-  void stopAudioPlay(){
+  void stopAudioPlay() {
     player.stop();
   }
 }

@@ -1,8 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:leavetheoffice/data/data_manager.dart';
 import 'package:leavetheoffice/data/database_helper.dart';
+import 'package:leavetheoffice/page/page_manager.dart';
 
 DataManager _dataManager;
 DatabaseHelper _databaseHelper;
+PageManager _pageManager;
 
 // DataManager, DbHelper는 앱 실행 최초 1회 생성
 DataManager getDataManager(){
@@ -19,4 +22,11 @@ DatabaseHelper getDatabaseHelper(){
   }
 
   return _databaseHelper;
+}
+
+PageManager getPageManager(){
+  if(_pageManager == null){
+    _pageManager = new PageManager();
+  }
+  return _pageManager;
 }

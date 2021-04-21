@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:leavetheoffice/data/attendance.dart';
 import 'package:leavetheoffice/page/alert_page.dart';
+import 'package:leavetheoffice/provider.dart';
 
 import '../data/staff_info_data.dart';
 
@@ -109,18 +110,6 @@ class _StaffState extends State<Staff> {
               ),
             ),
           ),
-          TextButton(
-            child: Text("알람 페이지 호출 테스트 버튼"),
-            onPressed: () {
-              Navigator.pushNamed((context), AlertPage.routeName,
-                      arguments: info)
-                  .then((v) {
-                timeMessage = beforeWork;
-                buttonMessage = buttonTexts[0];
-                setState(() {});
-              });
-            },
-          )
         ],
       ),
     );
@@ -229,6 +218,8 @@ class _StaffState extends State<Staff> {
     }
 
     if(remainSecond == 0){
+      getPageManager().pushPageArgs(context, info);
+      /*
       Navigator.pushNamed((context), AlertPage.routeName,
           arguments: info)
           .then((v) {
@@ -236,9 +227,10 @@ class _StaffState extends State<Staff> {
         buttonMessage = buttonTexts[0];
         setState(() {});
       });
+      */
     }
 
-    if(remainSecond < 0)
+    if(remainSecond < 0 && info.isWorking)
     timeMessage = "퇴근하세요!";
 
     setState(() {});

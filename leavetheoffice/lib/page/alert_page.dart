@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:leavetheoffice/components/custom_button.dart';
 import 'package:leavetheoffice/data/staff_info_data.dart';
+import 'package:leavetheoffice/provider.dart';
 
 class AlertPage extends StatefulWidget {
   static const routeName = '/alert';
@@ -28,7 +29,7 @@ class _AlertPageState extends State<AlertPage> {
     args = ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
-      appBar: AppBar(centerTitle: true, title: Text("앵무시계")),
+      appBar: AppBar(centerTitle: true, title: Text("앵무시계"), automaticallyImplyLeading: false,),
       body: Container(
         child: Align(
             alignment: Alignment.topCenter,
@@ -87,20 +88,18 @@ class _AlertPageState extends State<AlertPage> {
   void _acceptClicked() {
     args.switchIsWorking();
     args.setEndTime(DateTime.now());
-    // update text components
-
-    stopAudioPlay();
     args.endTimer();
-
-    Navigator.pop(context);
+    stopAudioPlay();
+    getPageManager().broadcastPop(args.id);
   }
 
   void _cancelClicked() {
     stopAudioPlay();
-    Navigator.pop(context);
+    getPageManager().broadcastPop(args.id);
   }
 
   void audioPlay() async{
+    debugPrint("music playing");
     const audioPath = "IU-LILAC.mp3";
     player = await cache.play(audioPath);
   }

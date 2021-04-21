@@ -20,7 +20,7 @@ class _StaffState extends State<Staff> {
   // Constants
   static const List<String> buttonTexts = ["출근하기", "퇴근하기"];
   static const String beforeWork = "출근 전";
-  static const int standartHourPerSecond = 30;
+  static const int standartHourPerSecond = 10;
 
   // Staff info
   Staff_info info;
@@ -217,8 +217,16 @@ class _StaffState extends State<Staff> {
     DateTime now = DateTime.now();
     int nowSec = now.hour * 3600 + now.minute * 60 + now.second;
     int remainSecond = standartHourPerSecond - (nowSec - info.startTimeSec);
-    timeMessage =
-        "${(remainSecond / 3600).floor()}시간 ${((remainSecond % 3600) / 60).floor()}분";
+    timeMessage = "";
+    if((remainSecond / 3600).floor() > 0) {
+         timeMessage += "${(remainSecond / 3600).floor()}시간 ";
+    }
+    if(((remainSecond % 3600) / 60).floor() > 0){
+      timeMessage += "${((remainSecond % 3600) / 60).floor()}분";
+    }
+    if(remainSecond < 60){
+      timeMessage = "${remainSecond}초";
+    }
 
     if(remainSecond == 0){
       Navigator.pushNamed((context), AlertPage.routeName,
@@ -229,6 +237,9 @@ class _StaffState extends State<Staff> {
         setState(() {});
       });
     }
+
+    if(remainSecond < 0)
+    timeMessage = "퇴근하세요!";
 
     setState(() {});
   }

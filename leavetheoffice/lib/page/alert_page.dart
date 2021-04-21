@@ -1,9 +1,11 @@
+import 'dart:async';
+
+import 'package:audioplayers/audio_cache.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:leavetheoffice/components/custom_button.dart';
-import 'package:leavetheoffice/components/staff_component.dart';
 import 'package:leavetheoffice/data/staff_info_data.dart';
-import 'package:leavetheoffice/page/main_page.dart';
 
 class AlertPage extends StatefulWidget {
   static const routeName = '/alert';
@@ -17,6 +19,9 @@ class AlertPage extends StatefulWidget {
 class _AlertPageState extends State<AlertPage> {
   String name = "OOO";
   Staff_info args;
+  AudioCache cache = new AudioCache();
+  AudioPlayer player = new AudioPlayer();
+  Timer _timer;
 
   @override
   Widget build(BuildContext context) {
@@ -64,17 +69,43 @@ class _AlertPageState extends State<AlertPage> {
     );
   }
 
+
+  @override
+  void initState() {
+    super.initState();
+    audioPlay();
+    _timer = new Timer(Duration(seconds: 10), (){
+      _cancelClicked();
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   void _acceptClicked() {
     args.switchIsWorking();
     args.setEndTime(DateTime.now());
     // update text components
 
+    stopAudioPlay();
     args.endTimer();
 
     Navigator.pop(context);
   }
 
   void _cancelClicked() {
+    stopAudioPlay();
     Navigator.pop(context);
+  }
+
+  void audioPlay() async{
+    const audioPath = "IU-LILAC.mp3";
+    player = await cache.play(audioPath);
+  }
+
+  void stopAudioPlay(){
+    player.stop();
   }
 }

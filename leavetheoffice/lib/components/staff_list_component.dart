@@ -18,7 +18,10 @@ class _StaffListState extends State<StaffList> {
     DateTime now = DateTime.now();
     return Expanded(
       child: FutureBuilder(
-          future: Future.wait([getDataManager().staffList(), getDataManager().getTodayAtts(Date(now.year, now.month, now.day))]),
+          future: Future.wait([
+            getDataManager().staffList(),
+            getDataManager().getTodayAtts(Date(now.year, now.month, now.day))
+          ]),
           builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
@@ -26,6 +29,12 @@ class _StaffListState extends State<StaffList> {
             if (snapshot.hasData) {
               List<Staff_info> staffList = snapshot.data[0];
               List<Attendance> todayAtt = snapshot.data[1];
+              List<Attendance> alignedAtt = new List(staffList.length);
+              for (int i = 0; i < todayAtt.length; i++) {
+                alignedAtt[todayAtt[i].id - 1] = todayAtt[i];
+                debugPrint(todayAtt[i].id.toString() + ":" + todayAtt[i].date.toString());
+              }
+
               return GridView.builder(
                 shrinkWrap: true,
                 padding: EdgeInsets.symmetric(
@@ -33,7 +42,7 @@ class _StaffListState extends State<StaffList> {
                 ),
                 itemCount: staffList.length,
                 itemBuilder: (context, index) {
-                  return Staff(staffList[index], todayAtt);
+                  return Staff(staffList[index], alignedAtt[index]);
                 },
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,

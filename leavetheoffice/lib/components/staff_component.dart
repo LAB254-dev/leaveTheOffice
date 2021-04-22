@@ -10,7 +10,7 @@ import '../data/staff_info_data.dart';
 
 class Staff extends StatefulWidget {
   Staff_info info;
-  List<Attendance> todayAttendance;
+  Attendance todayAttendance;
 
   Staff(this.info, this.todayAttendance);
 
@@ -24,7 +24,7 @@ class _StaffState extends State<Staff> {
 
   // Staff info
   Staff_info info;
-  List<Attendance> todayAttendance;
+  Attendance todayAttendance;
   int remainSecond = -1;
 
   // Component variables
@@ -94,7 +94,9 @@ class _StaffState extends State<Staff> {
             flex: 75,
             child: Center(
               child: CustomButton(
-                  buttonMessage, info.workState == 2 ? null : _buttonClicked),
+                  // 현재 근무 상태가 2(퇴근)이면 버튼 비활성화
+                  buttonMessage,
+                  info.workState == 2 ? null : _buttonClicked),
             ),
           ),
         ],
@@ -105,24 +107,20 @@ class _StaffState extends State<Staff> {
   @override
   void initState() {
     super.initState();
-
     _setInitWork();
 
+    // 애플리케이션이 중단되진 않았으나 화면에 그려지지 않아 삭제된 컴포넌트인 경우, 타이머를 다시 시작
     if (info.timer != null && info.workState == 1) {
-      // 애플리케이션이 중단되진 않았으나 화면에 그려지지 않아 삭제된 컴포넌트인 경우, 타이머를 다시 시작
       _setStartWork();
     }
 
     // 애플리케이션이 중간에 중단되었다가 재시동된 경우 판단
-    for (int i = 0; i < todayAttendance.length; i++) {
-      if (todayAttendance[i].id == info.id) {
-        info.setAttendance(todayAttendance[i]);
-        debugPrint(todayAttendance[i].end.toString());
-        if (info.workState == 1) {
-          _setStartWork();
-        } else if (info.workState == 2) {
-          _setEndWork();
-        }
+    if (todayAttendance != null) {
+      info.setAttendance(todayAttendance);
+      if (info.workState == 1) {
+        _setStartWork();
+      } else if (info.workState == 2) {
+        _setEndWork();
       }
     }
   }
@@ -138,8 +136,7 @@ class _StaffState extends State<Staff> {
       //click when start working
       DateTime now = DateTime.now();
       _setStartWork();
-      info.setStartTime(Time(now.hour, now.minute, now.second), false,
-          date: Date(now.year, now.month, now.day));
+      info.setStartTime(Time(now.hour, now.minute, now.second), false,);
     } else {
       //click during working
       showDialog(
@@ -218,6 +215,9 @@ class _StaffState extends State<Staff> {
             child: Text("취소")),
         ElevatedButton(
             onPressed: () {
+              info.workState = 2;
+              info.setEndTime(DateTime.now());
+              info.endTimer();
               _setEndWork();
               Navigator.pop(context);
             },

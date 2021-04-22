@@ -30,10 +30,11 @@ class Staff_info {
   }
 
   // DB
-  void setStartTime(Time time, bool isSaved, {Date date}){
+  void setStartTime(Time time, bool isSaved){
     // 근무 시작 시간 저장
+    DateTime now = DateTime.now();
     startTimeSec = time.hour * 3600 + time.min * 60 + time.sec;
-    _attendance = new Attendance(id, date, time);
+    _attendance = new Attendance(id, Date(now.year, now.month, now.day), time);
     workState = 1;
     if(!isSaved)  // 데이터베이스에 저장
       getDataManager().addAttData(_attendance);

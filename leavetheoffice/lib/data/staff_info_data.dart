@@ -57,6 +57,7 @@ class Staff_info {
   }
 
   void setAttendance(Attendance attendance){
+    // 기존 근태 기록이 있는 경우 근태 기록을 저장하고, 근무 상태를 판단
     workState = 0;
     if(attendance != null) {
       _attendance = attendance;

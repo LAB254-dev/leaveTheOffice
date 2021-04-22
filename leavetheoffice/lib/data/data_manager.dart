@@ -56,8 +56,6 @@ class DataManager {
   Future<void> updateAttData(Attendance att, int id, Date date) async {
     // 근태 기록을 수정함(퇴근하기 버튼 클릭 시 실행)
     Database db = await getDatabaseHelper().getDatabase();
-
-    debugPrint(id.toString()+":"+date.toString());
     db.update(Attendance.attTableName, getDatabaseHelper().attToRow(att),
         where: "${Attendance.columnId} = ? and ${Attendance.columnDate} = ?",
         whereArgs: [id, date.toString()]);

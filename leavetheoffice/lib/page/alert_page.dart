@@ -18,10 +18,15 @@ class AlertPage extends StatefulWidget {
 }
 
 class _AlertPageState extends State<AlertPage> {
+  // 직원 정보
   String name = "OOO";
   Staff_info args;
+
+  // 음악 재생
   AudioCache cache = new AudioCache();
   AudioPlayer player = new AudioPlayer();
+
+  // 타이머
   Timer _timer;
 
   @override
@@ -53,17 +58,17 @@ class _AlertPageState extends State<AlertPage> {
                     Text(
                       args.name,
                       style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          TextStyle(fontFamily: "NotoSans", fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       "님",
-                      style: TextStyle(fontSize: 18),
+                      style: TextStyle(fontSize: 18, fontFamily: "NotoSans"),
                     ),
                   ],
                 ),
                 Text(
                   "퇴근해주세요!",
-                  style: TextStyle(fontSize: 18),
+                  style: TextStyle(fontSize: 18, fontFamily: "NotoSans"),
                 ),
                 SizedBox(height: 20),
                 CustomButton("퇴근하기", _acceptClicked),
@@ -81,9 +86,10 @@ class _AlertPageState extends State<AlertPage> {
 
   @override
   void initState() {
+    // 화면이 시작하자마자 음악 재생, 타이머 실행
     super.initState();
     audioPlay();
-    _timer = new Timer(Duration(seconds: 10), () {
+    _timer = new Timer(Duration(seconds: 30), () {
       _cancelClicked();
     });
   }
@@ -94,23 +100,26 @@ class _AlertPageState extends State<AlertPage> {
   }
 
   void _acceptClicked() {
+    // 퇴근하기 버튼을 클릭했을 때
     args.workState = 2;
     stopAudioPlay();
     getPageManager().broadcastPop(args.id);
   }
 
   void _cancelClicked() {
+    // 취소 버튼을 클릭했을 때
     stopAudioPlay();
     getPageManager().broadcastPop(args.id);
   }
 
   void audioPlay() async {
-    debugPrint("music playing");
+    // 음악 재생
     const audioPath = "IU-LILAC.mp3";
     player = await cache.play(audioPath);
   }
 
   void stopAudioPlay() {
+    // 음악 종료
     player.stop();
   }
 }

@@ -13,7 +13,7 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(4.0),
+      padding: const EdgeInsets.all(3.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           minimumSize: Size(300, 15),
@@ -27,7 +27,7 @@ class CustomButton extends StatelessWidget {
             vertical: 15,
           ),
         ),
-        child: Text(title),
+        child: Text(title, style: TextStyle(fontFamily: "NotoSans", fontSize: 12),),
         onPressed: callback,
       ),
     );

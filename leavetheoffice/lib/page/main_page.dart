@@ -26,7 +26,7 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("앵무시계"),
+        title: Text("앵무시계", style: TextStyle(fontFamily: "NotoSans"),),
         actions: [
           IconButton(
               icon: Icon(Icons.refresh),

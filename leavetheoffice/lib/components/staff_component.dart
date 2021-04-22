@@ -1,34 +1,37 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:leavetheoffice/components/custom_button.dart';
+import 'package:leavetheoffice/data/att_data_format.dart';
 import 'package:leavetheoffice/data/attendance.dart';
+import 'package:leavetheoffice/provider.dart';
 
 import '../data/staff_info_data.dart';
 
 class Staff extends StatefulWidget {
   Staff_info info;
-  List<Attendance> todayAtt;
+  Attendance todayAttendance;
 
-  Staff(this.info, this.todayAtt);
+  Staff(this.info, this.todayAttendance);
 
   @override
-  State createState() => _StaffState(info, todayAtt);
+  State createState() => _StaffState(info, todayAttendance);
 }
 
 class _StaffState extends State<Staff> {
   // Constants
-  static const List<String> buttonTexts = ["출근하기", "퇴근하기"];
-  static const String beforeWork = "출근 전";
+  static const int standartHourPerSecond = 9 * 3600;
 
   // Staff info
   Staff_info info;
-  List<Attendance> todayAtt;
+  Attendance todayAttendance;
+  int remainSecond = -1;
 
   // Component variables
-  String timeMessage = beforeWork;
-  String buttonMessage = buttonTexts[0];
+  String timeMessage = "";
+  String buttonMessage = "";
 
-  _StaffState(this.info, this.todayAtt);
+  _StaffState(this.info, this.todayAttendance);
 
   @override
   Widget build(BuildContext context) {
@@ -48,93 +51,61 @@ class _StaffState extends State<Staff> {
           ),
         ],
       ),
-      child: Column(
-        children: [
-          Expanded(
-            flex: 55,
-            child: Center(
-              child: Text(
-                '환영합니다. ❤ ${info.roll != null ? info.roll : "담당 로딩 실패.."}',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 70,
-            child: Center(
-              child: Text(
-                info.name != null ? info.name : "이름 로딩 실패..",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 48,
-                  color: Colors.yellow.shade700,
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 50,
-            child: Center(
-              child: Text(
-                timeMessage,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Color(0xFFE05764),
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 75,
-            child: Center(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(30.0),
-                  ),
-                  primary: Colors.lightBlue.shade600,
-                  onPrimary: Colors.white,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 140,
-                    vertical: 15,
+      child: Align(
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(height: 5,),
+              Center(
+                child: Text(
+                  '환영합니다. ❤ ${info.roll != null ? info.roll : "담당 로딩 실패.."}',
+                  style: TextStyle(
+                    fontFamily: "NotoSans",
+                    fontSize: 15,
                   ),
                 ),
-                child: Text(buttonMessage),
-                onPressed: _buttonClicked,
               ),
-            ),
-          )
-        ],
+              Center(
+                child: Text(
+                  info.name != null ? info.name : "이름 로딩 실패..",
+                  style: TextStyle(
+                    fontFamily: "NotoSans",
+                    fontWeight: FontWeight.bold,
+                    fontSize: 40,
+                    color: Colors.yellow.shade700,
+                  ),
+                ),
+              ),
+              Center(
+                child: Text(
+                  timeMessage,
+                  style: TextStyle(
+                    fontFamily: "NotoSans",
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Color(0xFFE05764),
+                  ),
+                ),
+              ),
+              SizedBox(height: 5,),
+              Center(
+                child: CustomButton(
+                    // 현재 근무 상태가 2(퇴근)이면 버튼 비활성화
+                    buttonMessage,
+                    info.workState == 2 ? null : _buttonClicked),
+              ),
+          ],
+        ),
       ),
     );
   }
 
   @override
   void initState() {
-    DateTime now = DateTime.now();
-    if (info.timer != null && info.isWorking) {
-      // 화면에 그려지지 않아 삭제된 컴포넌트인 경우, 타이머를 다시 시작
-      buttonMessage = buttonTexts[1];
-      _updateWorkHours();
-      _setTimer();
-      setState(() {});
-    }
+    super.initState();
 
-    // 애플리케이션이 중간에 중단되었다가 재시동된 경우 판단
-    for(int i =0; i < todayAtt.length; i++){
-      if(todayAtt[i].id == info.id && todayAtt[i].end == null){
-        info.isWorking = true;
-        info.setStartTime(DateTime(todayAtt[i].date.year, todayAtt[i].date.month, todayAtt[i].date.day,
-            todayAtt[i].start.hour, todayAtt[i].start.min, todayAtt[i].start.sec), isSaved: true);
-        buttonMessage = buttonTexts[1];
-        _updateWorkHours();
-        _setTimer();
-        setState(() {});
-      }
-    }
+    _setInitWork();
   }
 
   @override
@@ -144,67 +115,128 @@ class _StaffState extends State<Staff> {
   }
 
   void _buttonClicked() {
-    debugPrint(info.id.toString());
-    if (!info.isWorking) {
+    if (info.workState == 0) {
       //click when start working
-      // update data
-      info.switchIsWorking();
-      info.setStartTime(DateTime.now());
-      debugPrint(DateTime.now().toString());
-      //update text component
-      buttonMessage = buttonTexts[1];
-
-      _setTimer();
-      _updateWorkHours();
+      DateTime now = DateTime.now();
+      _setStartWork();
+      info.setStartTime(
+        Time(now.hour, now.minute, now.second),
+        false,
+      );
     } else {
       //click during working
       showDialog(
           context: context,
           builder: (context) {
-            return AlertDialog(
-              title: Text("퇴근하기"),
-              content: Text("퇴근하시겠습니까?"),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text("취소")),
-                ElevatedButton(
-                    onPressed: () {
-                      // update data
-                      info.switchIsWorking();
-                      info.setEndTime(DateTime.now());
-                      // update text components
-                      timeMessage = beforeWork;
-                      buttonMessage = buttonTexts[0];
-
-                      info.endTimer();
-                      setState(() {});
-
-                      Navigator.pop(context);
-                    },
-                    child: Text("확인")),
-              ],
-            );
+            return _endWorkAlertDialog();
           });
     }
   }
 
+  void _calculRemainSecond() {
+    // 남은 시간 계산
+    DateTime now = DateTime.now();
+    int nowSec = now.hour * 3600 + now.minute * 60 + now.second;
+    if (info.workState == 1)
+      remainSecond = standartHourPerSecond - (nowSec - info.startTimeSec);
+    else
+      remainSecond = standartHourPerSecond;
+  }
+
   void _updateWorkHours() {
     // 시간 갱신 및 화면 새로고침
-    DateTime now = DateTime.now();
-    int nowSec = now.hour * 360 + now.minute * 60 + now.second;
-    timeMessage =
-        "${((nowSec - info.startTimeSec) / 3600).floor()}시간 ${((nowSec - info.startTimeSec) / 60).floor()}분";
+    _calculRemainSecond();
+    timeMessage = "";
+
+    // 출근 전인 경우
+    if(info.workState == 0){
+      timeMessage = "출근 전";
+      buttonMessage = "출근하기";
+      return;
+    }
+
+    // 근무중인 경우
+    if (remainSecond > 0) {
+      int hour = (remainSecond / 3600).floor();
+      int min = ((remainSecond % 3600) / 60).floor();
+      if (hour > 0) timeMessage += "$hour시간 ";
+      if (min > 0) timeMessage += "$min분";
+      if (remainSecond < 60) timeMessage = "$remainSecond초";
+    } else if (remainSecond == 0) {
+      getPageManager().pagePushRequest(context, info);
+    }
+
+    // 기준 근무 시간이 지났음에도 퇴근하지 않은 경우
+    if (remainSecond < 0 && info.workState == 1) timeMessage = "퇴근하세요!";
+
+    // 퇴근한 경우
+    if (info.workState == 2) {
+      _setEndWork();
+      info.setEndTime(DateTime.now());
+      info.endTimer();
+    }
 
     setState(() {});
   }
 
-  void _setTimer() {
-    // 타이머 설
+  void _setInitWork() {
+    info.workState = 0;
+
+    // 애플리케이션이 중단되진 않았으나 화면에 그려지지 않아 삭제된 컴포넌트인 경우, 타이머를 다시 시작
+    if (info.timer != null && info.workState == 1) {
+      _setStartWork();
+    }
+
+    // 애플리케이션이 중간에 중단되었다가 재시동된 경우 판단
+    if (todayAttendance != null) {
+      info.setAttendance(todayAttendance);
+      if (info.workState == 1) {
+        _setStartWork();
+      } else if (info.workState == 2) {
+        _setEndWork();
+      }
+    }
+    _updateWorkHours();
+  }
+
+  void _setStartWork() {
+    // 근무 시작 세팅
+    info.workState = 1;
+    buttonMessage = "퇴근하기";
     info.startTimer(new Timer.periodic(Duration(seconds: 1), (t) {
       _updateWorkHours();
     }));
+  }
+
+  void _setEndWork() {
+    // 근무 종료 세팅
+    timeMessage = "퇴근함";
+    buttonMessage = "퇴근하기";
+    info.workState = 2;
+    setState(() {});
+  }
+
+  Widget _endWorkAlertDialog() {
+    // 메인 화면에서 퇴근하기 버튼을 눌렀을 때 퇴근할지 묻는 팝업
+    return AlertDialog(
+      title: Text("퇴근하기"),
+      content: Text("퇴근하시겠습니까?"),
+      actions: [
+        TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text("취소")),
+        ElevatedButton(
+            onPressed: () {
+              info.workState = 2;
+              info.setEndTime(DateTime.now());
+              info.endTimer();
+              _setEndWork();
+              Navigator.pop(context);
+            },
+            child: Text("확인")),
+      ],
+    );
   }
 }

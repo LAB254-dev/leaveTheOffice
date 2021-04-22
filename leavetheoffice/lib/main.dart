@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:leavetheoffice/page/alert_page.dart';
 import 'package:leavetheoffice/page/main_page.dart';
 
 void main() {
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
       initialRoute: MainPage.routeName,
       routes: {
         MainPage.routeName: (context) => MainPage(),
+        AlertPage.routeName: (context) => AlertPage(),
       },
     );
   }

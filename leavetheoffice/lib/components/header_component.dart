@@ -27,8 +27,8 @@ class Header extends StatelessWidget {
                 padding: EdgeInsets.only(left: 15),
                 child: Column(
                   children: [
-                    Text("(주) 랩이오사의 근태관리"),
-                    Text("앱 서비스 입니다"),
+                    Text("(주) 랩이오사의 근태관리", style: TextStyle(fontFamily: "NotoSans",)),
+                    Text("앱 서비스 입니다", style: TextStyle(fontFamily: "NotoSans",)),
                   ],
                 ),
               ),

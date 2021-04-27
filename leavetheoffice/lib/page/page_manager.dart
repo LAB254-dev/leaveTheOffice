@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:leavetheoffice/data/staff_info_data.dart';
 import 'package:leavetheoffice/page/alert_page.dart';
-import 'package:path/path.dart';
 
 class PageManager {
   // FIFO queue

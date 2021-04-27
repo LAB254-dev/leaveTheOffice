@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:leavetheoffice/data/attendance.dart';
 import 'package:leavetheoffice/provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -76,6 +75,18 @@ class DataManager {
     List<Map<String, dynamic>> rows = await db.query(Attendance.attTableName,
         where: "${Attendance.columnDate} = ?", whereArgs: [date.toString()]);
     return rows.map((row) => getDatabaseHelper().rowToAtt(row)).toList();
+  }
+
+  Future<List<Staff_info>> getStaffInfoListWithAttendance(Date date) async {
+    Database db = await getDatabaseHelper().getDatabase();
+    String sql = '''
+    SELECT * FROM ${Staff_info.memTableName} 
+    LEFT OUTER JOIN 
+    (SELECT * FROM ${Attendance.attTableName} WHERE ${Attendance.columnDate} = '${date.toString()}') AS todayTable 
+    ON ${Staff_info.memTableName}.${Staff_info.columnId} = todayTable.${Attendance.columnId};
+    ''';
+    List<Map<String, dynamic>> rows = await db.rawQuery(sql);
+    return rows.map((e) => getDatabaseHelper().rowToStaffInfoWithAtt(e)).toList();
   }
 
   Future<void> initData() async {

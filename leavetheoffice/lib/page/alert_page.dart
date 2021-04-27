@@ -89,7 +89,7 @@ class _AlertPageState extends State<AlertPage> {
     // 화면이 시작하자마자 음악 재생, 타이머 실행
     super.initState();
     audioPlay();
-    _timer = new Timer(Duration(seconds: 30), () {
+    _timer = new Timer(Duration(seconds: 45), () {
       _cancelClicked();
     });
   }
@@ -101,7 +101,7 @@ class _AlertPageState extends State<AlertPage> {
 
   void _acceptClicked() {
     // 퇴근하기 버튼을 클릭했을 때
-    args.workState = 2;
+    args.workState = WorkState.afterWork;
     stopAudioPlay();
     getPageManager().broadcastPop(args.id);
   }
@@ -114,7 +114,7 @@ class _AlertPageState extends State<AlertPage> {
 
   void audioPlay() async {
     // 음악 재생
-    const audioPath = "IU-LILAC.mp3";
+    const audioPath = "";       //set audio file
     player = await cache.play(audioPath);
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:leavetheoffice/page/alert_page.dart';
 import 'package:leavetheoffice/page/main_page.dart';
+import 'package:leavetheoffice/page/staff_data_management_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -20,6 +21,7 @@ class MyApp extends StatelessWidget {
       routes: {
         MainPage.routeName: (context) => MainPage(),
         AlertPage.routeName: (context) => AlertPage(),
+        StaffDataManagement.routeName: (context) => StaffDataManagement(),
       },
     );
   }

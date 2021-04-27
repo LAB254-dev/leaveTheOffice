@@ -3,19 +3,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:leavetheoffice/components/custom_button.dart';
 import 'package:leavetheoffice/data/att_data_format.dart';
-import 'package:leavetheoffice/data/attendance.dart';
 import 'package:leavetheoffice/provider.dart';
 
 import '../data/staff_info_data.dart';
 
 class Staff extends StatefulWidget {
   Staff_info info;
-  Attendance todayAttendance;
 
-  Staff(this.info, this.todayAttendance);
+  Staff(this.info);
 
   @override
-  State createState() => _StaffState(info, todayAttendance);
+  State createState() => _StaffState(info);
 }
 
 class _StaffState extends State<Staff> {
@@ -24,14 +22,13 @@ class _StaffState extends State<Staff> {
 
   // Staff info
   Staff_info info;
-  Attendance todayAttendance;
   int remainSecond = -1;
 
   // Component variables
   String timeMessage = "";
   String buttonMessage = "";
 
-  _StaffState(this.info, this.todayAttendance);
+  _StaffState(this.info);
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +56,7 @@ class _StaffState extends State<Staff> {
             SizedBox(height: 5,),
               Center(
                 child: Text(
-                  '환영합니다. ❤ ${info.roll != null ? info.roll : "담당 로딩 실패.."}',
+                  '환영합니다. ❤ ${info.role != null ? info.role : "담당 로딩 실패.."}',
                   style: TextStyle(
                     fontFamily: "NotoSans",
                     fontSize: 15,
@@ -93,7 +90,7 @@ class _StaffState extends State<Staff> {
                 child: CustomButton(
                     // 현재 근무 상태가 2(퇴근)이면 버튼 비활성화
                     buttonMessage,
-                    info.workState == 2 ? null : _buttonClicked),
+                    info.workState == WorkState.afterWork ? null : _buttonClicked),
               ),
           ],
         ),
@@ -115,7 +112,7 @@ class _StaffState extends State<Staff> {
   }
 
   void _buttonClicked() {
-    if (info.workState == 0) {
+    if (info.workState == WorkState.beforeWork) {
       //click when start working
       DateTime now = DateTime.now();
       _setStartWork();
@@ -137,7 +134,7 @@ class _StaffState extends State<Staff> {
     // 남은 시간 계산
     DateTime now = DateTime.now();
     int nowSec = now.hour * 3600 + now.minute * 60 + now.second;
-    if (info.workState == 1)
+    if (info.workState == WorkState.working)
       remainSecond = standartHourPerSecond - (nowSec - info.startTimeSec);
     else
       remainSecond = standartHourPerSecond;
@@ -149,14 +146,14 @@ class _StaffState extends State<Staff> {
     timeMessage = "";
 
     // 출근 전인 경우
-    if(info.workState == 0){
+    if(info.workState == WorkState.beforeWork){
       timeMessage = "출근 전";
       buttonMessage = "출근하기";
       return;
     }
 
     // 근무중인 경우
-    if (remainSecond > 0) {
+    if (info.workState == WorkState.working && remainSecond > 0) {
       int hour = (remainSecond / 3600).floor();
       int min = ((remainSecond % 3600) / 60).floor();
       if (hour > 0) timeMessage += "$hour시간 ";
@@ -167,10 +164,10 @@ class _StaffState extends State<Staff> {
     }
 
     // 기준 근무 시간이 지났음에도 퇴근하지 않은 경우
-    if (remainSecond < 0 && info.workState == 1) timeMessage = "퇴근하세요!";
+    if (remainSecond < 0 && info.workState == WorkState.working) timeMessage = "퇴근하세요!";
 
     // 퇴근한 경우
-    if (info.workState == 2) {
+    if (info.workState == WorkState.afterWork) {
       _setEndWork();
       info.setEndTime(DateTime.now());
       info.endTimer();
@@ -180,28 +177,29 @@ class _StaffState extends State<Staff> {
   }
 
   void _setInitWork() {
-    info.workState = 0;
 
     // 애플리케이션이 중단되진 않았으나 화면에 그려지지 않아 삭제된 컴포넌트인 경우, 타이머를 다시 시작
-    if (info.timer != null && info.workState == 1) {
+    if (info.timer != null && info.workState == WorkState.working) {
       _setStartWork();
     }
 
+    if(info.attendance != null){
     // 애플리케이션이 중간에 중단되었다가 재시동된 경우 판단
-    if (todayAttendance != null) {
-      info.setAttendance(todayAttendance);
-      if (info.workState == 1) {
+      if (info.workState == WorkState.working) {
         _setStartWork();
-      } else if (info.workState == 2) {
+      } else if (info.workState == WorkState.afterWork) {
         _setEndWork();
       }
+    }
+    else{
+      info.workState = WorkState.beforeWork;
     }
     _updateWorkHours();
   }
 
   void _setStartWork() {
     // 근무 시작 세팅
-    info.workState = 1;
+    info.workState = WorkState.working;
     buttonMessage = "퇴근하기";
     info.startTimer(new Timer.periodic(Duration(seconds: 1), (t) {
       _updateWorkHours();
@@ -212,7 +210,7 @@ class _StaffState extends State<Staff> {
     // 근무 종료 세팅
     timeMessage = "퇴근함";
     buttonMessage = "퇴근하기";
-    info.workState = 2;
+    info.workState = WorkState.afterWork;
     setState(() {});
   }
 
@@ -229,7 +227,7 @@ class _StaffState extends State<Staff> {
             child: Text("취소")),
         ElevatedButton(
             onPressed: () {
-              info.workState = 2;
+              info.workState = WorkState.afterWork;
               info.setEndTime(DateTime.now());
               info.endTimer();
               _setEndWork();

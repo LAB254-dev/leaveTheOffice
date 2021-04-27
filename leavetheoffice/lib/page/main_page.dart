@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:leavetheoffice/components/header_component.dart';
 import 'package:leavetheoffice/components/staff_list_component.dart';
-import 'package:leavetheoffice/page/alert_page.dart';
+import 'package:leavetheoffice/page/staff_data_management_page.dart';
 
 import '../components/header_component.dart';
 import '../components/staff_list_component.dart';
@@ -26,13 +26,24 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("앵무시계", style: TextStyle(fontFamily: "NotoSans"),),
+        title: Text(
+          "앵무시계",
+          style: TextStyle(fontFamily: "NotoSans"),
+        ),
         actions: [
+          IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: () {
+                Navigator.pushNamed(context, StaffDataManagement.routeName)
+                    .then((value) {
+                  setState(() {});
+                });
+              }),
           IconButton(
               icon: Icon(Icons.refresh),
               onPressed: () {
                 setState(() {});
-              })
+              }),
         ],
       ),
       body: Center(

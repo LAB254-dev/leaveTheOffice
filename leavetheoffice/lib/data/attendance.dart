@@ -5,7 +5,7 @@ class Attendance{
 
   //DB table / column 이름 정의
   static const String attTableName = "attendance";
-  static const String columnId = "id";
+  static const String columnId = "attId";
   static const String columnDate = "date";
   static const String columnStart = "start";
   static const String columnEnd = "end";

@@ -1,15 +1,19 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:leavetheoffice/data/att_data_format.dart';
 import 'package:leavetheoffice/data/attendance.dart';
 import 'package:leavetheoffice/provider.dart';
+
+enum WorkState {
+  beforeWork, working, afterWork
+}
 
 class Staff_info {
   // 기본 정보
   int id;
   String name;
-  String roll;
+  String role;
 
   // DB
   static const String memTableName = "members";  //table name
@@ -18,14 +22,14 @@ class Staff_info {
   static const String columnRole = "role";
 
   // 시간 계산
-  Attendance _attendance;
+  Attendance attendance;
   int startTimeSec;
   Timer timer;
-  int workState; // 0: before, 1: ing, 2: after
+  WorkState workState;
 
   Staff_info(String name, String role, {int id}) {
     this.name = name;
-    this.roll = role;
+    this.role = role;
     this.id = id;
   }
 
@@ -34,17 +38,17 @@ class Staff_info {
     // 근무 시작 시간 저장
     DateTime now = DateTime.now();
     startTimeSec = time.hour * 3600 + time.min * 60 + time.sec;
-    _attendance = new Attendance(id, Date(now.year, now.month, now.day), time);
-    workState = 1;
+    attendance = new Attendance(id, Date(now.year, now.month, now.day), time);
+    workState = WorkState.working;
     if(!isSaved)  // 데이터베이스에 저장
-      getDataManager().addAttData(_attendance);
+      getDataManager().addAttData(attendance);
   }
 
   void setEndTime(DateTime now){
     // 근무 종료 시간 저장
-    _attendance.end = Time(now.hour, now.minute, now.second);
+    attendance.end = Time(now.hour, now.minute, now.second);
     // 데이터베이스에 저장
-    getDataManager().updateAttData(_attendance, id, _attendance.date);
+    getDataManager().updateAttData(attendance, id, attendance.date);
   }
 
   // Timer
@@ -56,17 +60,17 @@ class Staff_info {
     this.timer?.cancel();
   }
 
-  void setAttendance(Attendance attendance){
+  void setAttendance(Attendance att){
     // 기존 근태 기록이 있는 경우 근태 기록을 저장하고, 근무 상태를 판단
-    workState = 0;
-    if(attendance != null) {
-      _attendance = attendance;
-      setStartTime(attendance.start, true);
-      if (attendance.end == null) {
-        workState = 1;
+    attendance = att;
+    workState = WorkState.beforeWork;
+    if(att != null) {
+      setStartTime(att.start, true);
+      if (att.end == null) {
+        workState = WorkState.working;
       }
       else {
-        workState = 2;
+        workState = WorkState.afterWork;
       }
     }
   }

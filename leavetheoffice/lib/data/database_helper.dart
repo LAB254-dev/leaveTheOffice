@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:leavetheoffice/data/attendance.dart';
 import 'package:leavetheoffice/data/staff_info_data.dart';
 import 'package:path/path.dart';
@@ -53,7 +54,7 @@ class DatabaseHelper {
     // Staff_info 클래스를 row 형식으로 바꿈
     return {
       Staff_info.columnName: info.name,
-      Staff_info.columnRole: info.roll,
+      Staff_info.columnRole: info.role,
     };
   }
 
@@ -73,8 +74,11 @@ class DatabaseHelper {
     };
   }
 
-  Attendance rowToAtt(Map<String, dynamic> row) {
+  Attendance rowToAtt(Map<String, dynamic> row, {bool joinedTable = false}) {
     // row 형식 데이터를 Attendance 형식 데이터로 바꿈
+    if(row[Attendance.columnDate] == null) {
+      return null;
+    }
     List<String> date = row[Attendance.columnDate].split("-");
     List<int> dateInt = date.map((e)=>int.parse(e)).toList();
     List<String> start = row[Attendance.columnStart].toString().split(":");
@@ -86,10 +90,24 @@ class DatabaseHelper {
     } else {
       endInt = null;
     }
+    if(joinedTable){
+      return new Attendance(
+          row[Staff_info.columnId],
+          Date(dateInt[0], dateInt[1], dateInt[2]),
+          Time(startInt[0], startInt[1], startInt[2]),
+          end: endInt == null ? null : Time(endInt[0], endInt[1], endInt[2]));
+    }
     return new Attendance(
         row[Attendance.columnId],
         Date(dateInt[0], dateInt[1], dateInt[2]),
         Time(startInt[0], startInt[1], startInt[2]),
         end: endInt == null ? null : Time(endInt[0], endInt[1], endInt[2]));
+  }
+
+  Staff_info rowToStaffInfoWithAtt (Map<String, dynamic> row){
+    Attendance att = rowToAtt(row, joinedTable: true);
+    Staff_info info = rowToMem(row);
+    info.setAttendance(att);
+    return info;
   }
 }

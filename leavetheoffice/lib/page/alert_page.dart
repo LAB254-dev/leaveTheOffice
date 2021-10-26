@@ -5,6 +5,8 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:leavetheoffice/components/custom_button.dart';
+import 'package:leavetheoffice/data/data_manager.dart';
+import 'package:leavetheoffice/data/music_data.dart';
 import 'package:leavetheoffice/data/staff_info_data.dart';
 import 'package:leavetheoffice/provider.dart';
 
@@ -32,6 +34,7 @@ class _AlertPageState extends State<AlertPage> {
   @override
   Widget build(BuildContext context) {
     args = ModalRoute.of(context).settings.arguments;
+    audioPlay();
 
     return Scaffold(
       appBar: AppBar(
@@ -57,8 +60,10 @@ class _AlertPageState extends State<AlertPage> {
                   children: [
                     Text(
                       args.name,
-                      style:
-                          TextStyle(fontFamily: "NotoSans", fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontFamily: "NotoSans",
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
                     ),
                     Text(
                       "님",
@@ -88,7 +93,6 @@ class _AlertPageState extends State<AlertPage> {
   void initState() {
     // 화면이 시작하자마자 음악 재생, 타이머 실행
     super.initState();
-    audioPlay();
     _timer = new Timer(Duration(seconds: 45), () {
       _cancelClicked();
     });
@@ -114,8 +118,8 @@ class _AlertPageState extends State<AlertPage> {
 
   void audioPlay() async {
     // 음악 재생
-    const audioPath = "";       //set audio file
-    player = await cache.play(audioPath);
+    MusicData data = await getDataManager().getMusicData(args.musicId);
+    player = await cache.play(data.root);
   }
 
   void stopAudioPlay() {

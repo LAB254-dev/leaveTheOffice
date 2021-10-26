@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:leavetheoffice/data/attendance.dart';
 import 'package:leavetheoffice/data/staff_info_data.dart';
+import 'package:leavetheoffice/data/music_data.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -29,9 +30,12 @@ class DatabaseHelper {
           CREATE TABLE ${Staff_info.memTableName}(
             ${Staff_info.columnId} INTEGER PRIMARY KEY AUTOINCREMENT,
             ${Staff_info.columnName} TEXT NOT NULL,
-            ${Staff_info.columnRole} TEXT NOT NULL
+            ${Staff_info.columnRole} TEXT NOT NULL,
+            ${Staff_info.columnMusicId} INTEGER,
+            CONSTRAINT musicId_fk FOREIGN KEY(${Staff_info.columnMusicId})
+            REFERENCES ${MusicData.musicDataTableName}(${MusicData.musicDataId})
           );
-          ''';
+      ''';
       //근태 기록을 저장하는 테이블 생성 쿼리
       String createAttTable = '''
           CREATE TABLE ${Attendance.attTableName}(
@@ -45,6 +49,15 @@ class DatabaseHelper {
               ON UPDATE NO ACTION
           );
           ''';
+      String createMusicDataTable = '''
+        CREATE TABLE ${MusicData.musicDataTableName}(
+          ${MusicData.musicDataId} INTEGER PRIMARY KEY AUTOINCREMENT,
+          ${MusicData.musicDataTitle} TEXT,
+          ${MusicData.musicDataArtist} TEXT,
+          ${MusicData.musicDataRoot} TEXT
+        );
+      ''';
+      await db.execute(createMusicDataTable);
       await db.execute(createMemTable);
       await db.execute(createAttTable);
     });
@@ -55,13 +68,33 @@ class DatabaseHelper {
     return {
       Staff_info.columnName: info.name,
       Staff_info.columnRole: info.role,
+      Staff_info.columnMusicId: info.musicId
     };
   }
 
   Staff_info rowToMem(Map<String, dynamic> row) {
     // row 형식 데이터를 Staff_info 형식으로 바꿈
     return Staff_info(row[Staff_info.columnName], row[Staff_info.columnRole],
+        row[Staff_info.columnMusicId],
         id: row[Staff_info.columnId]);
+  }
+
+  Map<String, dynamic> musicToRow(MusicData data) {
+    // MusicData 클래스를 row 형식으로 바꿈
+    return {
+      MusicData.musicDataId: data.id,
+      MusicData.musicDataTitle: data.title,
+      MusicData.musicDataArtist: data.artist,
+      MusicData.musicDataRoot: data.root
+    };
+  }
+
+  MusicData rowToMusic(Map<String, dynamic> row) {
+    // row 형식 데이터를 Staff_info 형식으로 바꿈
+    return MusicData(row[MusicData.musicDataTitle],
+        row[MusicData.musicDataArtist],
+        row[MusicData.musicDataRoot],
+        id: row[MusicData.musicDataId]);
   }
 
   Map<String, dynamic> attToRow(Attendance att) {
@@ -76,11 +109,11 @@ class DatabaseHelper {
 
   Attendance rowToAtt(Map<String, dynamic> row, {bool joinedTable = false}) {
     // row 형식 데이터를 Attendance 형식 데이터로 바꿈
-    if(row[Attendance.columnDate] == null) {
+    if (row[Attendance.columnDate] == null) {
       return null;
     }
     List<String> date = row[Attendance.columnDate].split("-");
-    List<int> dateInt = date.map((e)=>int.parse(e)).toList();
+    List<int> dateInt = date.map((e) => int.parse(e)).toList();
     List<String> start = row[Attendance.columnStart].toString().split(":");
     List<int> startInt = start.map((e) => int.parse(e)).toList();
     List<int> endInt;
@@ -90,7 +123,7 @@ class DatabaseHelper {
     } else {
       endInt = null;
     }
-    if(joinedTable){
+    if (joinedTable) {
       return new Attendance(
           row[Staff_info.columnId],
           Date(dateInt[0], dateInt[1], dateInt[2]),
@@ -104,7 +137,7 @@ class DatabaseHelper {
         end: endInt == null ? null : Time(endInt[0], endInt[1], endInt[2]));
   }
 
-  Staff_info rowToStaffInfoWithAtt (Map<String, dynamic> row){
+  Staff_info rowToStaffInfoWithAtt(Map<String, dynamic> row) {
     Attendance att = rowToAtt(row, joinedTable: true);
     Staff_info info = rowToMem(row);
     info.setAttendance(att);

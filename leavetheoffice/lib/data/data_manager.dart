@@ -1,5 +1,6 @@
 import 'package:leavetheoffice/data/attendance.dart';
 import 'package:leavetheoffice/provider.dart';
+import 'package:leavetheoffice/data/music_data.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'att_data_format.dart';
@@ -86,16 +87,71 @@ class DataManager {
     ON ${Staff_info.memTableName}.${Staff_info.columnId} = todayTable.${Attendance.columnId};
     ''';
     List<Map<String, dynamic>> rows = await db.rawQuery(sql);
-    return rows.map((e) => getDatabaseHelper().rowToStaffInfoWithAtt(e)).toList();
+    return rows
+        .map((e) => getDatabaseHelper().rowToStaffInfoWithAtt(e))
+        .toList();
+  }
+
+  Future<int> addMusicData(MusicData data) async {
+    Database db = await getDatabaseHelper().getDatabase();
+    int id = await db.insert(
+        MusicData.musicDataTableName, getDatabaseHelper().musicToRow(data));
+    return id;
+  }
+
+  Future<MusicData> getMusicData(int id) async {
+    Database db = await getDatabaseHelper().getDatabase();
+    List<Map<String, dynamic>> row = await db.query(
+        MusicData.musicDataTableName,
+        where: "${MusicData.musicDataId} = ?",
+        whereArgs: [id]);
+    return getDatabaseHelper().rowToMusic(row.single);
+  }
+
+  Future<List<MusicData>> getMusicList() async {
+    // 저장된 모든 음악 정보를 가져옴
+    Database db = await getDatabaseHelper().getDatabase();
+    List<Map<String, dynamic>> rows =
+        await db.query(MusicData.musicDataTableName);
+    return rows.map((row) => getDatabaseHelper().rowToMusic(row)).toList();
+  }
+
+  Future<void> updateMusicData(MusicData musicData, int id) async {
+    Database db = await getDatabaseHelper().getDatabase();
+    db.update(MusicData.musicDataTableName,
+        getDatabaseHelper().musicToRow(musicData));
+  }
+
+  Future<void> deleteMusicData(int id) async {
+    Database db = await getDatabaseHelper().getDatabase();
+    db.delete(MusicData.musicDataTableName,
+        where: "${MusicData.musicDataId} = ?", whereArgs: [id]);
   }
 
   Future<void> initData() async {
     // 앱 최초 설치/실행 시 추가되는 데이터
-    await addStaff(new Staff_info("이아영", "DESIGNER"));
-    await addStaff(new Staff_info("김도연", "DEVELOPER"));
-    await addStaff(new Staff_info("박지윤", "DEVELOPER"));
-    await addStaff(new Staff_info("박정아", "PM"));
-    await addStaff(new Staff_info("상한규", "INTERN"));
-    await addStaff(new Staff_info("당병진", "DEVELOPER"));
+    int musicId =
+        await addMusicData(new MusicData("Blueming", "아이유", "blueming.mp3"));
+    await addMusicData(
+        new MusicData("Dance Monkey", "Tones And I", "dancemonkey.mp3"));
+    await addMusicData(new MusicData("LILAC", "아이유", "lilac.mp3"));
+    await addMusicData(
+        new MusicData("My Universe", "Coldplay x BTS", "myuniverse.mp3"));
+    await addMusicData(
+        new MusicData("낙하 (NAKKA)", "AKMU with 아이유", "nakka.mp3"));
+    await addMusicData(
+        new MusicData("STAY", "The Kid LAROI, Justin Bieber", "stay.mp3"));
+    await addMusicData(
+        new MusicData("strawberry moon", "아이유", "strawberrymoon.mp3"));
+    await addMusicData(new MusicData("신호등", "이무진", "trafficlight.mp3"));
+    await addStaff(new Staff_info("이아영", "CEO / DESIGNER", musicId));
+    await addStaff(new Staff_info("김도연", "CTO / DEVELOPER", musicId));
+    await addStaff(new Staff_info("박지윤", "DEVELOPER", musicId));
+    await addStaff(new Staff_info("김익선", "BUSINESS MANAGER", musicId));
+    await addStaff(new Staff_info("상한규", "DEVELOPER", musicId));
+    await addStaff(new Staff_info("당병진", "DEVELOPER", musicId));
+    await addStaff(new Staff_info("백상수", "DEVELOPER", musicId));
+    await addStaff(new Staff_info("박문석", "DEVELOPER", musicId));
+    await addStaff(new Staff_info("김유미", "DESIGNER", musicId));
   }
 }

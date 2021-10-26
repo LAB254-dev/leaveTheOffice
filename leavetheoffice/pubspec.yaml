@@ -50,6 +50,16 @@ flutter:
 
   assets:
      - assets/Logo.png
+     - assets/blueming.mp3
+     - assets/dancemonkey.mp3
+     - assets/lilac.mp3
+     - assets/myuniverse.mp3
+     - assets/nakka.mp3
+     - assets/stay.mp3
+     - assets/strawberrymoon.mp3
+     - assets/trafficlight.mp3
+     - assets/default.mp3
+     - assets/pororo.mp3
   # set audio file
   fonts:
     - family: NotoSans

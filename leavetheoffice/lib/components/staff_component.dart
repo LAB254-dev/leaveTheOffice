@@ -19,6 +19,7 @@ class Staff extends StatefulWidget {
 class _StaffState extends State<Staff> {
   // Constants
   static const int standartHourPerSecond = 9 * 3600;
+  // static const int standartHourPerSecond = 9;
 
   // Staff info
   Staff_info info;

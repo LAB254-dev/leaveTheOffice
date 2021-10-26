@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:leavetheoffice/components/music_list_component.dart';
+import 'package:leavetheoffice/data/music_data.dart';
 import 'package:leavetheoffice/data/staff_info_data.dart';
 import 'package:leavetheoffice/provider.dart';
 
@@ -80,6 +82,11 @@ class _StaffDataManagementState extends State<StaffDataManagement> {
       )),
       DataColumn(
           label: Text(
+        "음악",
+        style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "NotoSans"),
+      )),
+      DataColumn(
+          label: Text(
         "삭제",
         style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "NotoSans"),
       ))
@@ -107,6 +114,12 @@ class _StaffDataManagementState extends State<StaffDataManagement> {
           icon: Icon(Icons.edit),
           onPressed: () {
             _editStaff(list[i]);
+          },
+        )),
+        DataCell(IconButton(
+          icon: Icon(Icons.music_note),
+          onPressed: () {
+            _selectMusic(list[i]);
           },
         )),
         DataCell(IconButton(
@@ -155,7 +168,7 @@ class _StaffDataManagementState extends State<StaffDataManagement> {
                     if (nameController.text.isNotEmpty &&
                         roleController.text.isNotEmpty) {
                       getDataManager().addStaff(new Staff_info(
-                          nameController.text, roleController.text));
+                          nameController.text, roleController.text, 1));
                       setState(() {});
                       Navigator.pop(context);
                     }
@@ -201,9 +214,10 @@ class _StaffDataManagementState extends State<StaffDataManagement> {
                   child: Text("취소")),
               ElevatedButton(
                   onPressed: () {
-                    if(nameController.text.isNotEmpty && roleController.text.isNotEmpty) {
+                    if (nameController.text.isNotEmpty &&
+                        roleController.text.isNotEmpty) {
                       getDataManager().updateStaff(info.id,
-                          Staff_info(nameController.text, roleController.text));
+                          Staff_info(nameController.text, roleController.text, info.musicId));
                       setState(() {});
                       Navigator.pop(context);
                     }
@@ -235,6 +249,47 @@ class _StaffDataManagementState extends State<StaffDataManagement> {
                       Navigator.pop(context);
                     },
                     child: Text("삭제"))
+              ],
+            ));
+  }
+
+  void _selectMusic(Staff_info info) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text("음악 선택"),
+              content: Container(
+                    width: 300.0,
+                    height: 300.0,
+                    child: FutureBuilder(
+                      future: getDataManager().getMusicList(),
+                      builder: (context, snapshot) {
+                        getDataManager().getMusicData(1).then((data) {
+                          print(data);
+                        });
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        if (snapshot.hasData) {
+                          List<MusicData> list = snapshot.data;
+                          return MusicList(
+                            staff: info,
+                            musicList: list
+                          );
+                        }
+                        return Center(child: Text("데이터 불러오기 실패"));
+                      },
+                  )
+                  ),
+              actions: [
+                TextButton(
+                  child: Text("뒤로가기"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
               ],
             ));
   }

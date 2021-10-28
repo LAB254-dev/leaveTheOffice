@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:leavetheoffice/data/staff_info_data.dart';
@@ -5,7 +7,6 @@ import 'package:leavetheoffice/provider.dart';
 
 class StaffDataManagement extends StatefulWidget {
   static const routeName = '/staff';
-
   @override
   State<StatefulWidget> createState() {
     return _StaffDataManagementState();
@@ -75,6 +76,11 @@ class _StaffDataManagementState extends State<StaffDataManagement> {
       )),
       DataColumn(
           label: Text(
+        "기숙사",
+        style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "NotoSans"),
+      )),
+      DataColumn(
+          label: Text(
         "수정",
         style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "NotoSans"),
       )),
@@ -103,6 +109,12 @@ class _StaffDataManagementState extends State<StaffDataManagement> {
           list[i].role,
           style: TextStyle(fontFamily: "NotoSans"),
         )),
+        DataCell(
+          Container(
+            child: getIconofDomitory(list[i].dorm),
+            width: 40,
+          ),
+        ),
         DataCell(IconButton(
           icon: Icon(Icons.edit),
           onPressed: () {
@@ -120,19 +132,36 @@ class _StaffDataManagementState extends State<StaffDataManagement> {
     return rows;
   }
 
+  final List<String> _dormList = ['그리핀도르', '레번클로', '슬리데린', '후플푸프'];
+
+  String _dormSelected = '그리핀도르';
+
+  Image getIconofDomitory(String domitory) {
+    if (domitory == '슬리데린') {
+      return Image.asset('assets/Slytherin.png');
+    } else if (domitory == '그리핀도르') {
+      return Image.asset('assets/Griffindor.png');
+    } else if (domitory == '레번클로') {
+      return Image.asset('assets/Ravenclaw.png');
+    } else {
+      return Image.asset('assets/Hufflepuff.png');
+    }
+  }
+
   void _addStaff() {
     // 직원 추가 버튼 클릭 시 팝업, 내용을 데이터베이스에 추가
     TextEditingController nameController = new TextEditingController();
     TextEditingController roleController = new TextEditingController();
+
     showDialog(
         context: context,
         builder: (context) {
-          return AlertDialog(
-            title: Text("직원 추가"),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
+          String dormBuffer = _dormSelected;
+          return StatefulBuilder(builder: (context, setState) {
+            return AlertDialog(
+              title: Text("직원 추가"),
+              content: SingleChildScrollView(
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
                   TextField(
                     controller: nameController,
                     decoration: InputDecoration(labelText: "이름"),
@@ -141,28 +170,48 @@ class _StaffDataManagementState extends State<StaffDataManagement> {
                     controller: roleController,
                     decoration: InputDecoration(labelText: "직책"),
                   ),
-                ],
+                  DropdownButton<String>(
+                    // hint: new Text('select dorm'),
+                    isExpanded: true,
+                    value: dormBuffer,
+                    icon: Icon(Icons.arrow_drop_down),
+                    onChanged: (String data) {
+                      setState(() {
+                        dormBuffer = data;
+                      });
+                    },
+                    items:
+                        _dormList.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ]),
               ),
-            ),
-            actions: [
-              TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text("취소")),
-              ElevatedButton(
-                  onPressed: () {
-                    if (nameController.text.isNotEmpty &&
-                        roleController.text.isNotEmpty) {
-                      getDataManager().addStaff(new Staff_info(
-                          nameController.text, roleController.text));
-                      setState(() {});
+              actions: [
+                TextButton(
+                    onPressed: () {
                       Navigator.pop(context);
-                    }
-                  },
-                  child: Text("저장")),
-            ],
-          );
+                    },
+                    child: Text("취소")),
+                ElevatedButton(
+                    onPressed: () {
+                      if (nameController.text.isNotEmpty &&
+                          roleController.text.isNotEmpty) {
+                        getDataManager().addStaff(new Staff_info(
+                            nameController.text,
+                            roleController.text,
+                            dormBuffer));
+                        setState(() {});
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: Text("저장")),
+              ],
+            );
+          });
         });
   }
 
@@ -173,44 +222,70 @@ class _StaffDataManagementState extends State<StaffDataManagement> {
     nameController.text = info.name;
     roleController.text = info.role;
 
+    String dormBuffer = info.dorm;
+
     showDialog(
         context: context,
         builder: (context) {
-          return AlertDialog(
-            title: Text("직원 추가"),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: nameController,
-                    decoration: InputDecoration(labelText: "이름"),
-                  ),
-                  TextField(
-                    controller: roleController,
-                    decoration: InputDecoration(labelText: "직책"),
-                  ),
-                ],
+          // String houseName = info.dorm;
+          return StatefulBuilder(builder: (context, setState) {
+            return AlertDialog(
+              title: Text("정보 수정"),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(labelText: "이름"),
+                    ),
+                    TextField(
+                      controller: roleController,
+                      decoration: InputDecoration(labelText: "직책"),
+                    ),
+                    DropdownButton<String>(
+                      isExpanded: true,
+                      value: dormBuffer,
+                      icon: Icon(Icons.arrow_drop_down),
+                      onChanged: (String data) {
+                        setState(() {
+                          dormBuffer = data;
+                        });
+                      },
+                      items: _dormList
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            actions: [
-              TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text("취소")),
-              ElevatedButton(
-                  onPressed: () {
-                    if(nameController.text.isNotEmpty && roleController.text.isNotEmpty) {
-                      getDataManager().updateStaff(info.id,
-                          Staff_info(nameController.text, roleController.text));
-                      setState(() {});
+              actions: [
+                TextButton(
+                    onPressed: () {
                       Navigator.pop(context);
-                    }
-                  },
-                  child: Text("저장")),
-            ],
-          );
+                    },
+                    child: Text("취소")),
+                ElevatedButton(
+                    onPressed: () {
+                      if (nameController.text.isNotEmpty &&
+                          roleController.text.isNotEmpty) {
+                        info.dorm = dormBuffer;
+                        getDataManager().updateStaff(
+                            info.id,
+                            Staff_info(nameController.text, roleController.text,
+                                dormBuffer));
+                        setState(() {});
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: Text("저장")),
+              ],
+            );
+          });
         });
   }
 

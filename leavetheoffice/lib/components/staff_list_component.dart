@@ -17,7 +17,8 @@ class _StaffListState extends State<StaffList> {
     DateTime now = DateTime.now();
     return Expanded(
       child: FutureBuilder(
-          future: getDataManager().getStaffInfoListWithAttendance(Date(now.year, now.month, now.day)),
+          future: getDataManager().getStaffInfoListWithAttendance(
+              Date(now.year, now.month, now.day)),
           builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
             // 데이터를 불러오는 중
             if (snapshot.connectionState == ConnectionState.waiting) {

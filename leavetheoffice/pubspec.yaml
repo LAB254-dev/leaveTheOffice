@@ -50,6 +50,10 @@ flutter:
 
   assets:
      - assets/Logo.png
+     - assets/Griffindor.png
+     - assets/Hufflepuff.png
+     - assets/Ravenclaw.png
+     - assets/Slytherin.png
   # set audio file
   fonts:
     - family: NotoSans

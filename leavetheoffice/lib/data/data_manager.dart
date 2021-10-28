@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:leavetheoffice/data/attendance.dart';
 import 'package:leavetheoffice/provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -86,16 +87,21 @@ class DataManager {
     ON ${Staff_info.memTableName}.${Staff_info.columnId} = todayTable.${Attendance.columnId};
     ''';
     List<Map<String, dynamic>> rows = await db.rawQuery(sql);
-    return rows.map((e) => getDatabaseHelper().rowToStaffInfoWithAtt(e)).toList();
+    return rows
+        .map((e) => getDatabaseHelper().rowToStaffInfoWithAtt(e))
+        .toList();
   }
 
   Future<void> initData() async {
     // 앱 최초 설치/실행 시 추가되는 데이터
-    await addStaff(new Staff_info("이아영", "DESIGNER"));
-    await addStaff(new Staff_info("김도연", "DEVELOPER"));
-    await addStaff(new Staff_info("박지윤", "DEVELOPER"));
-    await addStaff(new Staff_info("박정아", "PM"));
-    await addStaff(new Staff_info("상한규", "INTERN"));
-    await addStaff(new Staff_info("당병진", "DEVELOPER"));
+    await addStaff(new Staff_info("이아영", "DESIGNER", "그리핀도르"));
+    await addStaff(new Staff_info("김도연", "CTO", "그리핀도르"));
+    await addStaff(new Staff_info("박지윤", "Front-End DEVELOPER", "그리핀도르"));
+    await addStaff(new Staff_info("김익선", "PM", "그리핀도르"));
+    await addStaff(new Staff_info("상한규", "INTERN", "그리핀도르"));
+    await addStaff(new Staff_info("당병진", "UI DEVELOPER", "그리핀도르"));
+    await addStaff(new Staff_info("백상수", "Back-EndDEVELOPER", "그리핀도르"));
+    await addStaff(new Staff_info("박문석", "DEVELOPER", "슬리데린"));
+    await addStaff(new Staff_info("김유미", "UI/UX Designer", "그리핀도르"));
   }
 }

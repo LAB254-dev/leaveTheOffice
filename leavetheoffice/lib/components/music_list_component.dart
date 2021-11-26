@@ -5,7 +5,7 @@ import 'package:leavetheoffice/provider.dart';
 
 class MusicList extends StatefulWidget {
   final Staff_info staff;
-  final List<MusicData> musicList;
+  final List<Music_data> musicList;
 
   const MusicList({this.staff, this.musicList});
 

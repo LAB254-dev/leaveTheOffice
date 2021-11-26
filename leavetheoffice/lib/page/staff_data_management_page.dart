@@ -2,6 +2,9 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:leavetheoffice/components/music_list_component.dart';
+import 'package:leavetheoffice/data/dorm_types.dart';
+import 'package:leavetheoffice/data/music_data.dart';
 import 'package:leavetheoffice/data/staff_info_data.dart';
 import 'package:leavetheoffice/provider.dart';
 
@@ -86,6 +89,11 @@ class _StaffDataManagementState extends State<StaffDataManagement> {
       )),
       DataColumn(
           label: Text(
+        "음악",
+        style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "NotoSans"),
+      )),
+      DataColumn(
+          label: Text(
         "삭제",
         style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "NotoSans"),
       ))
@@ -111,7 +119,7 @@ class _StaffDataManagementState extends State<StaffDataManagement> {
         )),
         DataCell(
           Container(
-            child: getIconofDomitory(list[i].dorm),
+            child: getIconOfDomitory(list[i].dorm),
             width: 40,
           ),
         ),
@@ -119,6 +127,12 @@ class _StaffDataManagementState extends State<StaffDataManagement> {
           icon: Icon(Icons.edit),
           onPressed: () {
             _editStaff(list[i]);
+          },
+        )),
+        DataCell(IconButton(
+          icon: Icon(Icons.music_note),
+          onPressed: () {
+            _selectMusic(list[i]);
           },
         )),
         DataCell(IconButton(
@@ -132,20 +146,71 @@ class _StaffDataManagementState extends State<StaffDataManagement> {
     return rows;
   }
 
-  final List<String> _dormList = ['그리핀도르', '레번클로', '슬리데린', '후플푸프'];
+  final List<String> _dormList = ['그리핀도르', '래번클로', '슬리데린', '후플푸프'];
 
   String _dormSelected = '그리핀도르';
 
-  Image getIconofDomitory(String domitory) {
-    if (domitory == '슬리데린') {
-      return Image.asset('assets/Slytherin.png');
-    } else if (domitory == '그리핀도르') {
-      return Image.asset('assets/Griffindor.png');
-    } else if (domitory == '레번클로') {
-      return Image.asset('assets/Ravenclaw.png');
-    } else {
-      return Image.asset('assets/Hufflepuff.png');
+  String getDormName(DormType dorm) {
+    String name;
+
+    switch (dorm) {
+      case DormType.GRYFFINDOR:
+        name = "그리핀도르";
+        break;
+      case DormType.HUFFLEPUFF:
+        name = "후플푸프";
+        break;
+      case DormType.RAVENCLAW:
+        name = "래번클로";
+        break;
+      case DormType.SLYTHERIN:
+        name = "슬리데린";
+        break;
     }
+
+    return name;
+  }
+
+  DormType getDormType(String dormName) {
+    DormType type;
+
+    switch (dormName) {
+      case "그리핀도르":
+        type = DormType.GRYFFINDOR;
+        break;
+      case "후플푸프":
+        type = DormType.HUFFLEPUFF;
+        break;
+      case "래번클로":
+        type = DormType.RAVENCLAW;
+        break;
+      case "슬리데린":
+        type = DormType.SLYTHERIN;
+        break;
+    }
+
+    return type;
+  }
+
+  Image getIconOfDomitory(DormType dorm) {
+    String name;
+
+    switch (dorm) {
+      case DormType.GRYFFINDOR:
+        name = "Griffindor";
+        break;
+      case DormType.HUFFLEPUFF:
+        name = "Hufflepuff";
+        break;
+      case DormType.RAVENCLAW:
+        name = "Ravenclaw";
+        break;
+      case DormType.SLYTHERIN:
+        name = "Slytherin";
+        break;
+    }
+
+    return Image.asset('assets/${name}.png');
   }
 
   void _addStaff() {
@@ -203,7 +268,8 @@ class _StaffDataManagementState extends State<StaffDataManagement> {
                         getDataManager().addStaff(new Staff_info(
                             nameController.text,
                             roleController.text,
-                            dormBuffer));
+                            getDormType(dormBuffer), Music_data.DEFALUT_MUSIC_ID),
+                            );
                         setState(() {});
                         Navigator.pop(context);
                       }
@@ -222,7 +288,7 @@ class _StaffDataManagementState extends State<StaffDataManagement> {
     nameController.text = info.name;
     roleController.text = info.role;
 
-    String dormBuffer = info.dorm;
+    String dormBuffer = getDormName(info.dorm);
 
     showDialog(
         context: context,
@@ -273,11 +339,12 @@ class _StaffDataManagementState extends State<StaffDataManagement> {
                     onPressed: () {
                       if (nameController.text.isNotEmpty &&
                           roleController.text.isNotEmpty) {
-                        info.dorm = dormBuffer;
+                        info.dorm = getDormType(dormBuffer);
                         getDataManager().updateStaff(
                             info.id,
                             Staff_info(nameController.text, roleController.text,
-                                dormBuffer));
+                                getDormType(dormBuffer),
+                                Music_data.DEFALUT_MUSIC_ID));
                         setState(() {});
                         Navigator.pop(context);
                       }
@@ -310,6 +377,43 @@ class _StaffDataManagementState extends State<StaffDataManagement> {
                       Navigator.pop(context);
                     },
                     child: Text("삭제"))
+              ],
+            ));
+  }
+
+  void _selectMusic(Staff_info info) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text("음악 선택"),
+              content: Container(
+                  width: 300.0,
+                  height: 300.0,
+                  child: FutureBuilder(
+                    future: getDataManager().getMusicList(),
+                    builder: (context, snapshot) {
+                      getDataManager().getMusicData(1).then((data) {
+                        print(data);
+                      });
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      if (snapshot.hasData) {
+                        List<Music_data> list = snapshot.data;
+                        return MusicList(staff: info, musicList: list);
+                      }
+                      return Center(child: Text("데이터 불러오기 실패"));
+                    },
+                  )),
+              actions: [
+                TextButton(
+                  child: Text("뒤로가기"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
               ],
             ));
   }

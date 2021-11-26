@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:leavetheoffice/data/attendance.dart';
+import 'package:leavetheoffice/data/dorm_types.dart';
 import 'package:leavetheoffice/data/staff_info_data.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'att_data_format.dart';
+import 'music_data.dart';
 
 class DatabaseHelper {
   Database _database;
@@ -30,7 +32,8 @@ class DatabaseHelper {
             ${Staff_info.columnId} INTEGER PRIMARY KEY AUTOINCREMENT,
             ${Staff_info.columnName} TEXT NOT NULL,
             ${Staff_info.columnRole} TEXT NOT NULL,
-            ${Staff_info.columnDorm} TEXT NOT NULL
+            ${Staff_info.columnDorm} INTEGER,
+            ${Staff_info.columnMusicId} INTEGER NOT NULL DEFAULT 0
           );
           ''';
       //근태 기록을 저장하는 테이블 생성 쿼리
@@ -46,8 +49,18 @@ class DatabaseHelper {
               ON UPDATE NO ACTION
           );
           ''';
+      //음악 데이터를 저장하는 테이블 생성 쿼리
+      String createMusicTable = '''
+          CREATE TABLE ${Music_data.tableName}(
+            ${Music_data.columnId} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${Music_data.columnTitle} TEXT NOT NULL,
+            ${Music_data.columnArtist} TEXT,
+            ${Music_data.columnRoot} TEXT
+          )
+      ''';
       await db.execute(createMemTable);
       await db.execute(createAttTable);
+      await db.execute(createMusicTable);
     });
   }
 
@@ -56,14 +69,16 @@ class DatabaseHelper {
     return {
       Staff_info.columnName: info.name,
       Staff_info.columnRole: info.role,
-      Staff_info.columnDorm: info.dorm
+      Staff_info.columnDorm: info.dorm.index,
+      Staff_info.columnMusicId: info.musicId
     };
   }
 
   Staff_info rowToMem(Map<String, dynamic> row) {
     // row 형식 데이터를 Staff_info 형식으로 바꿈
     return Staff_info(row[Staff_info.columnName], row[Staff_info.columnRole],
-        row[Staff_info.columnDorm],
+        DormType.values[row[Staff_info.columnDorm]],
+        row[Staff_info.columnMusicId],
         id: row[Staff_info.columnId]);
   }
 
@@ -112,5 +127,21 @@ class DatabaseHelper {
     Staff_info info = rowToMem(row);
     info.setAttendance(att);
     return info;
+  }
+
+  Map<String, dynamic> musicToRow(Music_data data) {
+    // Music_data 클래스를 row 형식으로 바꿈
+    return {
+      Music_data.columnTitle: data.title,
+      Music_data.columnArtist: data.artist,
+      Music_data.columnRoot: data.root,
+    };
+  }
+
+  Music_data rowToMusic(Map<String, dynamic> row) {
+    // row 형식 데이터를 Music_data 형식으로 바꿈
+    return Music_data(row[Music_data.columnTitle], row[Music_data.columnArtist],
+        row[Music_data.columnRoot],
+        id: row[Music_data.columnId]);
   }
 }

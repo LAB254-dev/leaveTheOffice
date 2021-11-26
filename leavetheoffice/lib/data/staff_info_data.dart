@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:leavetheoffice/data/att_data_format.dart';
 import 'package:leavetheoffice/data/attendance.dart';
+import 'package:leavetheoffice/data/dorm_types.dart';
 import 'package:leavetheoffice/provider.dart';
 
 enum WorkState { beforeWork, working, afterWork }
@@ -12,7 +13,8 @@ class Staff_info {
   int id;
   String name;
   String role;
-  String dorm;
+  DormType dorm;
+  int musicId;
 
   // DB
   static const String memTableName = "members"; //table name
@@ -20,6 +22,7 @@ class Staff_info {
   static const String columnName = "name";
   static const String columnRole = "role";
   static const String columnDorm = "dorm";
+  static const String columnMusicId = "music_id";
 
   // 시간 계산
   Attendance attendance;
@@ -27,10 +30,11 @@ class Staff_info {
   Timer timer;
   WorkState workState;
 
-  Staff_info(String name, String role, String dorm, {int id}) {
+  Staff_info(String name, String role, DormType dorm, int musicId, {int id}) {
     this.name = name;
     this.role = role;
     this.dorm = dorm;
+    this.musicId = musicId;
     this.id = id;
   }
 
